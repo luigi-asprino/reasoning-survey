@@ -24,9 +24,12 @@ relating those regimes to Description Logic families and OWL 2 profiles.
    | Repository | Ruleset |
    |---|---|
    | `reasoning-test-rdfs-plus-opt` | `rdfsplus-optimized` |
-   | `reasoning-test-horst` | `owl-horst-optimized` |
    | `reasoning-test-owl-max` | `owl-max-optimized` |
    | `reasoning-test-owl2-ql-opt` | `owl2-ql-optimized` |
+   | `reasoning-test-rl-opt` | `owl2-rl-optimized` |
+
+   An earlier run also used `reasoning-test-horst` (`owl-horst-optimized`);
+   its results are recorded in the notes.
 
    Uncheck **Disable owl:sameAs**, otherwise Q5 and Q9 are always empty.
 
@@ -52,17 +55,21 @@ aggregate queries).
 
 - `rdfsplus-optimized` applies neither `rdfs:domain` nor `rdfs:range`
   (Q1, Q2 empty), although inverse, symmetric and transitive properties work.
-  Not explained by the documented optimisations — to be confirmed on the
-  non-optimised ruleset.
+  `owl2-rl-optimized` applies them correctly, so the problem is specific to
+  that ruleset — to be confirmed on the non-optimised `rdfsplus`.
 - `owl-horst` handles `owl:intersectionOf` in both directions (beyond textbook pD\*).
 - `owl-max` differs from `owl-horst` here only on `owl:unionOf`.
+- `owl2-rl` passes every test: it matches `owl-max` on Q1–Q7 and is the only
+  ruleset firing property chains (Q8) and `owl:hasKey` (Q9). It also classifies
+  via an equivalence with an existential, which lies outside the RL profile.
 - `owl2-ql` is more permissive than the OWL 2 QL profile (subclass-side
-  intersection) and materialises far more (1596 implicit triples vs 193–361).
-- Q8 (property chains) and Q9 (`owl:hasKey`) are untested: no OWL 2 RL repository yet.
+  intersection).
+- Both OWL 2 rulesets type every individual as `owl:Thing` and materialise far
+  more (QL 1596, RL 1263 implicit triples vs 193–361).
 
 ## Next steps
 
-- Add `reasoning-test-owl2-rl` (and a plain `reasoning-test-rdfs`).
+- Add a plain `reasoning-test-rdfs` repository.
 - Re-run the RDFS-Plus domain/range test on the non-optimised ruleset.
 - Add a `maxCardinality 1` test to separate OWL-Max from OWL-Horst further.
 - Compare against a DL reasoner (HermiT / Konclude) to isolate what needs

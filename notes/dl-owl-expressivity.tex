@@ -766,10 +766,13 @@ and range rules --- which makes the first finding below unexpected.
 \subsection*{Empirical check}
 
 The claims above were tested on a small university knowledge graph that
-exercises one construct per axiom block, loaded into four repositories
+exercises one construct per axiom block, loaded into five repositories
 (\texttt{rdfsplus-optimized}, \texttt{owl-horst-optimized},
-\texttt{owl-max-optimized}, \texttt{owl2-ql-optimized}; \texttt{owl:sameAs}
-enabled) and queried with inference switched on. The key trick is an
+\texttt{owl-max-optimized}, \texttt{owl2-ql-optimized},
+\texttt{owl2-rl-optimized}; \texttt{owl:sameAs} enabled) over two runs, and
+queried with inference switched on. The Horst repository was replaced by the
+RL one between the two runs; all other results were identical across runs.
+The key trick is an
 individual with no asserted type, whose every class membership must therefore
 be inferred:
 \begin{lstlisting}
@@ -783,25 +786,25 @@ ex:alice   ex:teaches ex:kg101 .     # no rdf:type for ex:alice
 \footnotesize
 \newcommand{\tyes}{$\checkmark$}
 \newcommand{\tno}{$\times$}
-\begin{tabular}{@{}llcccc@{}}
+\begin{tabular}{@{}llccccc@{}}
 \toprule
-& \textbf{Construct tested} & \textbf{RDFS-Plus} & \textbf{Horst} &
-  \textbf{Max} & \textbf{QL}\\
+& \textbf{Construct tested} & \textbf{RDFS-Plus} & \textbf{Horst}$^{e}$ &
+  \textbf{Max} & \textbf{QL} & \textbf{RL}\\
 \midrule
-Q1 & domain, subclass                        & \tno$^{a}$ & \tyes & \tyes & \tyes\\
-Q2 & subproperty, range                      & \tno$^{a}$ & \tyes & \tyes & \tyes\\
-Q3 & inverse, symmetric                      & \tyes & \tyes & \tyes & \tyes\\
-Q3 & transitive                              & \tyes & \tyes & \tyes & \tno\\
-Q4 & equivalent class / property            & --$^{b}$ & \tyes & \tyes & \tyes\\
-Q5 & sameAs via (inverse-)functional prop.   & \tno & \tyes & \tyes & \tno\\
-Q6 & hasValue, someValuesFrom, allValuesFrom & \tno & \tyes & \tyes & \tno\\
-Q7 & intersection, subclass side             & \tno & \tyes$^{c}$ & \tyes & \tyes$^{d}$\\
-Q7 & intersection, superclass side           & \tno & \tyes & \tyes & \tyes\\
-Q7 & union, subclass side                    & \tno & \tno & \tyes & \tno\\
-Q8 & property chain                          & \tno & \tno & \tno & \tno\\
-Q9 & keys                                    & \tno & \tno & \tno & \tno\\
+Q1 & domain, subclass                        & \tno$^{a}$ & \tyes & \tyes & \tyes & \tyes\\
+Q2 & subproperty, range                      & \tno$^{a}$ & \tyes & \tyes & \tyes & \tyes\\
+Q3 & inverse, symmetric                      & \tyes & \tyes & \tyes & \tyes & \tyes\\
+Q3 & transitive                              & \tyes & \tyes & \tyes & \tno & \tyes\\
+Q4 & equivalent class / property            & --$^{b}$ & \tyes & \tyes & \tyes & \tyes\\
+Q5 & sameAs via (inverse-)functional prop.   & \tno & \tyes & \tyes & \tno & \tyes\\
+Q6 & hasValue, someValuesFrom, allValuesFrom & \tno & \tyes & \tyes & \tno & \tyes$^{f}$\\
+Q7 & intersection, subclass side             & \tno & \tyes$^{c}$ & \tyes & \tyes$^{d}$ & \tyes\\
+Q7 & intersection, superclass side           & \tno & \tyes & \tyes & \tyes & \tyes\\
+Q7 & union, subclass side                    & \tno & \tno & \tyes & \tno & \tyes\\
+Q8 & property chain                          & \tno & \tno & \tno & \tno & \tyes\\
+Q9 & keys                                    & \tno & \tno & \tno & \tno & \tyes\\
 \midrule
-Q10 & implicit triples                      & 193 & 337 & 361 & 1596\\
+Q10 & implicit triples                      & 193 & 337 & 361 & 1596 & 1263\\
 \bottomrule
 \end{tabular}
 
@@ -810,7 +813,10 @@ Q10 & implicit triples                      & 193 & 337 & 361 & 1596\\
 $^{a}$~unexpected, see below.\quad
 $^{b}$~not observable: the query depends on the domain inference.\\
 $^{c}$~beyond textbook $pD^*$.\quad
-$^{d}$~beyond the OWL~2~QL profile.
+$^{d}$~beyond the OWL~2~QL profile.\quad
+$^{e}$~first run only.\\
+$^{f}$~includes a classification that the OWL~2~RL profile does not license,
+see below.
 \end{table}
 
 \noindent
@@ -819,11 +825,18 @@ everywhere except on union, which confirms both the inclusion between the two
 and that union is the only difference this test bed exposes. Property values
 stated on an alias propagate across \texttt{owl:sameAs}. OWL~2~QL has no
 transitivity, no equality and no \texttt{hasValue}, and does not derive the
-qualified existential on the subclass side. Q8 and Q9 are empty everywhere
-simply because no \texttt{owl2-rl} repository was part of the run; that
-ruleset should return the chained affiliations and the key-based equality.
+qualified existential on the subclass side.
 
-Four observations deviate from expectations.
+OWL~2~RL is the only regime that passes every test. On Q1--Q7 it returns
+exactly what OWL-Max returns, plus \texttt{owl:Thing} typing; it is the only
+ruleset to fire property chains (Q8: the affiliation of \texttt{ex:alice}
+propagates from the research group to department, faculty and university) and
+keys (Q9: the two individuals sharing an ORCID are merged, and the h-index
+stated on one becomes a property of the other). On this test bed, then,
+\texttt{owl2-rl} strictly contains \texttt{owl-max}, which strictly contains
+\texttt{owl-horst} --- although the three are not nested by design.
+
+Five observations deviate from expectations.
 \begin{enumerate}
   \item \textbf{\texttt{rdfsplus-optimized} applies neither domain nor
     range.} Inverse, symmetric and transitive properties work, and
@@ -831,16 +844,28 @@ Four observations deviate from expectations.
     active; yet \texttt{ex:alice} receives no type and \texttt{ex:kg101} is
     never a course. An earlier run on an RDFS repository showed the same
     symptom. Nothing in the documentation of the optimised variants accounts
-    for it. To be confirmed by querying range and subproperty inferences
-    separately, and by repeating the run on the non-optimised ruleset.
+    for it, and \texttt{owl2-rl-optimized} applies domain and range
+    correctly, so the problem is not common to all optimised rulesets. To be
+    confirmed by querying range and subproperty inferences separately, and by
+    repeating the run on the non-optimised ruleset.
   \item \textbf{OWL-Horst supports intersection in both directions}, which
     textbook $pD^*$ does not.
   \item \textbf{OWL~2~QL derives membership in an intersection} (an individual
     typed with both conjuncts becomes an instance of the intersection class),
     a subclass-side use that $\dllite{\mathcal{R}}$ does not allow.
-  \item \textbf{OWL~2~QL materialises almost five times as much as OWL-Max},
-    partly because it types every individual as \texttt{owl:Thing}, which the
-    other optimised rulesets do not.
+  \item \textbf{OWL~2~RL classifies beyond its profile.} The test class
+    \texttt{Supervisor} is declared \emph{equivalent} to
+    $\exists\rn{supervises}.\cn{PhDStudent}$; since OWL~2~RL admits an
+    existential only in subclass position, the axiom lies outside the
+    profile. The ruleset nevertheless applies the classifying rule and types
+    \texttt{ex:alice} as a supervisor. This is the behaviour of the RL/RDF
+    rules, which match triples regardless of the syntactic position they came
+    from: the profile restricts what is \emph{guaranteed}, not what fires.
+  \item \textbf{The two OWL~2 rulesets materialise far more than the others}
+    (1596 implicit triples for QL, 1263 for RL, against 193--361). Both type
+    every individual as \texttt{owl:Thing}, which the other optimised
+    rulesets do not; QL still produces more than RL despite being the weaker
+    regime.
 \end{enumerate}
 
 \subsection*{Practical consequences}
@@ -859,7 +884,11 @@ Four observations deviate from expectations.
     inferred class assertions isolates exactly the consequences that need
     disjunctive or existential reasoning.
   \item \textbf{Materialisation cost varies sharply between rulesets}, and is
-    not monotone in apparent expressivity, as the QL figure shows.
+    not monotone in apparent expressivity: OWL~2~QL materialises more than
+    OWL~2~RL, and both several times more than OWL-Max.
+  \item \textbf{For ontologies that need more than RDFS-Plus, OWL~2~RL is the
+    safe default.} It was the only regime to pass every test, and the only one
+    covering property chains and keys.
 \end{itemize}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -976,7 +1005,11 @@ OWL~2~DL conformance.
   \item \textbf{OWL~2~RL} is the only ruleset that fires the property chains
     linking \texttt{assesses} to DUL's setting and aboutness relations, that
     reliably classifies events as \texttt{Disaster}, and that checks the
-    disjointness axioms ECMO relies on as coherence guards.
+    disjointness axioms ECMO relies on as coherence guards. The test bed
+    confirms that \texttt{owl2-rl-optimized} fires chains and applies domain
+    and range, and that it applies classifying rules even when the axiom as a
+    whole --- an equivalence with an existential --- lies outside the RL
+    profile, which is the shape of ECMO's \texttt{Disaster} definition.
   \item \textbf{OWL~2~QL} is unsuitable: without transitivity the whole
     \texttt{subsumedUnder} hierarchy is lost, together with chains and
     \texttt{hasValue}.

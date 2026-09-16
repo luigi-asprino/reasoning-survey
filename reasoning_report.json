@@ -1,27 +1,5 @@
 {
   "Q1": {
-    "reasoning-test-horst": {
-      "vars": [
-        "t"
-      ],
-      "rows": [
-        [
-          "_:b"
-        ],
-        [
-          "ex:Academic"
-        ],
-        [
-          "ex:Docente"
-        ],
-        [
-          "ex:Person"
-        ],
-        [
-          "ex:Supervisor"
-        ]
-      ]
-    },
     "reasoning-test-owl-max": {
       "vars": [
         "t"
@@ -71,45 +49,37 @@
         "t"
       ],
       "rows": []
-    }
-  },
-  "Q2": {
-    "reasoning-test-horst": {
+    },
+    "reasoning-test-rl-opt": {
       "vars": [
-        "who",
-        "c"
+        "t"
       ],
       "rows": [
         [
-          "ex:a_rossi",
-          "ex:kg101"
+          "_:b"
         ],
         [
-          "ex:a_rossi",
-          "ex:kgLab"
+          "ex:Academic"
         ],
         [
-          "ex:alice",
-          "ex:kg101"
+          "ex:Docente"
         ],
         [
-          "ex:alice",
-          "ex:kgLab"
+          "ex:Person"
         ],
         [
-          "ex:bruno",
-          "ex:db201"
+          "ex:Staff"
         ],
         [
-          "ex:profAlice",
-          "ex:kg101"
+          "ex:Supervisor"
         ],
         [
-          "ex:profAlice",
-          "ex:kgLab"
+          "owl:Thing"
         ]
       ]
-    },
+    }
+  },
+  "Q2": {
     "reasoning-test-owl-max": {
       "vars": [
         "who",
@@ -172,63 +142,45 @@
         "c"
       ],
       "rows": []
-    }
-  },
-  "Q3": {
-    "reasoning-test-horst": {
+    },
+    "reasoning-test-rl-opt": {
       "vars": [
-        "s",
-        "c",
-        "u"
+        "who",
+        "c"
       ],
       "rows": [
         [
-          "",
-          "",
-          "ex:dept"
-        ],
-        [
-          "",
-          "",
-          "ex:faculty"
-        ],
-        [
-          "",
-          "",
-          "ex:unibo"
-        ],
-        [
-          "",
           "ex:a_rossi",
-          ""
-        ],
-        [
-          "",
-          "ex:alice",
-          ""
-        ],
-        [
-          "",
-          "ex:profAlice",
-          ""
+          "ex:kg101"
         ],
         [
           "ex:a_rossi",
-          "",
-          ""
+          "ex:kgLab"
         ],
         [
           "ex:alice",
-          "",
-          ""
+          "ex:kg101"
+        ],
+        [
+          "ex:alice",
+          "ex:kgLab"
+        ],
+        [
+          "ex:bruno",
+          "ex:db201"
         ],
         [
           "ex:profAlice",
-          "",
-          ""
+          "ex:kg101"
+        ],
+        [
+          "ex:profAlice",
+          "ex:kgLab"
         ]
       ]
-    },
+    }
+  },
+  "Q3": {
     "reasoning-test-owl-max": {
       "vars": [
         "s",
@@ -336,6 +288,60 @@
         ],
         [
           "ex:alice",
+          "",
+          ""
+        ]
+      ]
+    },
+    "reasoning-test-rl-opt": {
+      "vars": [
+        "s",
+        "c",
+        "u"
+      ],
+      "rows": [
+        [
+          "",
+          "",
+          "ex:dept"
+        ],
+        [
+          "",
+          "",
+          "ex:faculty"
+        ],
+        [
+          "",
+          "",
+          "ex:unibo"
+        ],
+        [
+          "",
+          "ex:a_rossi",
+          ""
+        ],
+        [
+          "",
+          "ex:alice",
+          ""
+        ],
+        [
+          "",
+          "ex:profAlice",
+          ""
+        ],
+        [
+          "ex:a_rossi",
+          "",
+          ""
+        ],
+        [
+          "ex:alice",
+          "",
+          ""
+        ],
+        [
+          "ex:profAlice",
           "",
           ""
         ]
@@ -343,25 +349,6 @@
     }
   },
   "Q4": {
-    "reasoning-test-horst": {
-      "vars": [
-        "d"
-      ],
-      "rows": [
-        [
-          "ex:a_rossi"
-        ],
-        [
-          "ex:alice"
-        ],
-        [
-          "ex:bruno"
-        ],
-        [
-          "ex:profAlice"
-        ]
-      ]
-    },
     "reasoning-test-owl-max": {
       "vars": [
         "d"
@@ -399,29 +386,28 @@
         "d"
       ],
       "rows": []
+    },
+    "reasoning-test-rl-opt": {
+      "vars": [
+        "d"
+      ],
+      "rows": [
+        [
+          "ex:a_rossi"
+        ],
+        [
+          "ex:alice"
+        ],
+        [
+          "ex:bruno"
+        ],
+        [
+          "ex:profAlice"
+        ]
+      ]
     }
   },
   "Q5": {
-    "reasoning-test-horst": {
-      "vars": [
-        "same",
-        "hp"
-      ],
-      "rows": [
-        [
-          "ex:a_rossi",
-          "<http://example.org/~arossi>"
-        ],
-        [
-          "ex:alice",
-          "<http://example.org/~arossi>"
-        ],
-        [
-          "ex:profAlice",
-          "<http://example.org/~arossi>"
-        ]
-      ]
-    },
     "reasoning-test-owl-max": {
       "vars": [
         "same",
@@ -455,61 +441,29 @@
         "hp"
       ],
       "rows": []
+    },
+    "reasoning-test-rl-opt": {
+      "vars": [
+        "same",
+        "hp"
+      ],
+      "rows": [
+        [
+          "ex:a_rossi",
+          "<http://example.org/~arossi>"
+        ],
+        [
+          "ex:alice",
+          "<http://example.org/~arossi>"
+        ],
+        [
+          "ex:profAlice",
+          "<http://example.org/~arossi>"
+        ]
+      ]
     }
   },
   "Q6": {
-    "reasoning-test-horst": {
-      "vars": [
-        "c1",
-        "topic",
-        "s",
-        "r"
-      ],
-      "rows": [
-        [
-          "",
-          "",
-          "",
-          "ex:elena"
-        ],
-        [
-          "",
-          "",
-          "ex:a_rossi",
-          ""
-        ],
-        [
-          "",
-          "",
-          "ex:alice",
-          ""
-        ],
-        [
-          "",
-          "",
-          "ex:profAlice",
-          ""
-        ],
-        [
-          "",
-          "ex:SemanticWeb",
-          "",
-          ""
-        ],
-        [
-          "ex:kg101",
-          "",
-          "",
-          ""
-        ],
-        [
-          "ex:sw301",
-          "",
-          "",
-          ""
-        ]
-      ]
-    },
     "reasoning-test-owl-max": {
       "vars": [
         "c1",
@@ -586,6 +540,58 @@
         "r"
       ],
       "rows": [
+        [
+          "ex:sw301",
+          "",
+          "",
+          ""
+        ]
+      ]
+    },
+    "reasoning-test-rl-opt": {
+      "vars": [
+        "c1",
+        "topic",
+        "s",
+        "r"
+      ],
+      "rows": [
+        [
+          "",
+          "",
+          "",
+          "ex:elena"
+        ],
+        [
+          "",
+          "",
+          "ex:a_rossi",
+          ""
+        ],
+        [
+          "",
+          "",
+          "ex:alice",
+          ""
+        ],
+        [
+          "",
+          "",
+          "ex:profAlice",
+          ""
+        ],
+        [
+          "",
+          "ex:SemanticWeb",
+          "",
+          ""
+        ],
+        [
+          "ex:kg101",
+          "",
+          "",
+          ""
+        ],
         [
           "ex:sw301",
           "",
@@ -596,50 +602,6 @@
     }
   },
   "Q7": {
-    "reasoning-test-horst": {
-      "vars": [
-        "ws",
-        "gt",
-        "st"
-      ],
-      "rows": [
-        [
-          "",
-          "_:b",
-          ""
-        ],
-        [
-          "",
-          "ex:Employee",
-          ""
-        ],
-        [
-          "",
-          "ex:Person",
-          ""
-        ],
-        [
-          "",
-          "ex:Student",
-          ""
-        ],
-        [
-          "",
-          "ex:WorkingStudent",
-          ""
-        ],
-        [
-          "ex:franco",
-          "",
-          ""
-        ],
-        [
-          "ex:giulia",
-          "",
-          ""
-        ]
-      ]
-    },
     "reasoning-test-owl-max": {
       "vars": [
         "ws",
@@ -781,19 +743,83 @@
           ""
         ]
       ]
-    }
-  },
-  "Q8": {
-    "reasoning-test-horst": {
+    },
+    "reasoning-test-rl-opt": {
       "vars": [
-        "org"
+        "ws",
+        "gt",
+        "st"
       ],
       "rows": [
         [
-          "ex:kgGroup"
+          "",
+          "",
+          "ex:a_rossi"
+        ],
+        [
+          "",
+          "",
+          "ex:alice"
+        ],
+        [
+          "",
+          "",
+          "ex:bruno"
+        ],
+        [
+          "",
+          "",
+          "ex:hugo"
+        ],
+        [
+          "",
+          "",
+          "ex:profAlice"
+        ],
+        [
+          "",
+          "_:b",
+          ""
+        ],
+        [
+          "",
+          "ex:Employee",
+          ""
+        ],
+        [
+          "",
+          "ex:Person",
+          ""
+        ],
+        [
+          "",
+          "ex:Student",
+          ""
+        ],
+        [
+          "",
+          "ex:WorkingStudent",
+          ""
+        ],
+        [
+          "",
+          "owl:Thing",
+          ""
+        ],
+        [
+          "ex:franco",
+          "",
+          ""
+        ],
+        [
+          "ex:giulia",
+          "",
+          ""
         ]
       ]
-    },
+    }
+  },
+  "Q8": {
     "reasoning-test-owl-max": {
       "vars": [
         "org"
@@ -821,18 +847,30 @@
       "rows": [
         [
           "ex:kgGroup"
+        ]
+      ]
+    },
+    "reasoning-test-rl-opt": {
+      "vars": [
+        "org"
+      ],
+      "rows": [
+        [
+          "ex:dept"
+        ],
+        [
+          "ex:faculty"
+        ],
+        [
+          "ex:kgGroup"
+        ],
+        [
+          "ex:unibo"
         ]
       ]
     }
   },
   "Q9": {
-    "reasoning-test-horst": {
-      "vars": [
-        "x",
-        "h"
-      ],
-      "rows": []
-    },
     "reasoning-test-owl-max": {
       "vars": [
         "x",
@@ -853,19 +891,25 @@
         "h"
       ],
       "rows": []
-    }
-  },
-  "Q10": {
-    "reasoning-test-horst": {
+    },
+    "reasoning-test-rl-opt": {
       "vars": [
-        "n"
+        "x",
+        "h"
       ],
       "rows": [
         [
-          "\"337\""
+          "ex:d_verdi",
+          "\"13\""
+        ],
+        [
+          "ex:dario",
+          "\"13\""
         ]
       ]
-    },
+    }
+  },
+  "Q10": {
     "reasoning-test-owl-max": {
       "vars": [
         "n"
@@ -893,6 +937,16 @@
       "rows": [
         [
           "\"193\""
+        ]
+      ]
+    },
+    "reasoning-test-rl-opt": {
+      "vars": [
+        "n"
+      ],
+      "rows": [
+        [
+          "\"1263\""
         ]
       ]
     }
