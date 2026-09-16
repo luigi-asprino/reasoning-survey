@@ -1,0 +1,59 @@
+PREFIX ex:   <http://example.org/uni#>
+PREFIX owl:  <http://www.w3.org/2002/07/owl#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX onto: <http://www.ontotext.com/>
+
+# Q1 [RDFS] types of alice (domain + subClassOf)
+# expect: Academic, Person   (+ Docente/Staff/Supervisor with higher rulesets)
+SELECT ?t WHERE { ex:alice a ?t }
+
+# Q2 [RDFS] subPropertyOf + range -> kg101, kgLab (+ db201 via bruno in OWL-Horst)
+SELECT ?who ?c WHERE { ?who ex:teaches ?c . ?c a ex:Course }
+
+# Q3 [RDFS-Plus] inverse / symmetric / transitive
+# expect: carla supervisedBy alice; bruno collaboratesWith alice;
+#         kgGroup partOf dept, faculty, unibo
+SELECT * WHERE {
+  { ex:carla ex:supervisedBy ?s }
+  UNION { ex:bruno ex:collaboratesWith ?c }
+  UNION { ex:kgGroup ex:partOf ?u }
+}
+
+# Q4 [OWL-Horst] equivalentClass / equivalentProperty -> alice, bruno
+SELECT ?d WHERE { ?d a ex:Docente }
+
+# Q5 [OWL-Horst] sameAs from IFP (a_rossi) and FunctionalProperty (profAlice)
+# alice should also get a_rossi's homepage
+SELECT ?same ?hp WHERE {
+  ex:alice owl:sameAs ?same .
+  OPTIONAL { ex:alice ex:homepage ?hp }
+}
+
+# Q6 [OWL-Horst] hasValue (both directions), someValuesFrom, allValuesFrom
+# expect: kg101 a SemanticWebCourse; sw301 hasTopic SemanticWeb;
+#         alice a Supervisor; elena a Researcher
+SELECT * WHERE {
+  { ?c1 a ex:SemanticWebCourse }
+  UNION { ex:sw301 ex:hasTopic ?topic }
+  UNION { ?s a ex:Supervisor }
+  UNION { ?r a ex:Researcher }
+}
+
+# Q7 [OWL2-RL] intersection (both directions) and union
+# expect: franco, giulia WorkingStudent; giulia a Student, Employee;
+#         alice, bruno, hugo a Staff
+SELECT * WHERE {
+  { ?ws a ex:WorkingStudent }
+  UNION { ex:giulia a ?gt }
+  UNION { ?st a ex:Staff }
+}
+
+# Q8 [OWL2-RL] property chain -> kgGroup, dept, faculty, unibo
+SELECT ?org WHERE { ex:alice ex:affiliatedWith ?org }
+
+# Q9 [OWL2-RL] hasKey -> dario owl:sameAs d_verdi ; dario hIndex 13
+SELECT ?x ?h WHERE { ex:dario owl:sameAs ?x . OPTIONAL { ex:dario ex:hIndex ?h } }
+
+# Q10 inferred-only statements (GraphDB pseudo-graph); swap for
+# onto:explicit to see the asserted ones
+SELECT (COUNT(*) AS ?n) FROM onto:implicit WHERE { ?s ?p ?o }

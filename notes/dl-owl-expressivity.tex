@@ -1,0 +1,1066 @@
+% !TeX program = pdflatex
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage[hidelinks]{hyperref}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Listing style for Turtle / OWL functional syntax
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\definecolor{ttlkeyword}{rgb}{0.10,0.30,0.65}
+\definecolor{ttlcomment}{rgb}{0.45,0.45,0.45}
+\definecolor{ttlstring}{rgb}{0.60,0.15,0.15}
+\definecolor{ttlbg}{gray}{0.97}
+
+\lstdefinelanguage{turtle}{
+  morekeywords={a,rdf:type,rdfs:subClassOf,rdfs:subPropertyOf,rdfs:domain,
+    rdfs:range,rdfs:Datatype,owl:Class,owl:Restriction,owl:Thing,owl:Nothing,
+    owl:onProperty,owl:someValuesFrom,owl:allValuesFrom,owl:hasValue,owl:hasSelf,
+    owl:intersectionOf,owl:unionOf,owl:complementOf,owl:oneOf,
+    owl:equivalentClass,owl:disjointWith,owl:inverseOf,
+    owl:propertyChainAxiom,owl:propertyDisjointWith,owl:hasKey,
+    owl:TransitiveProperty,owl:SymmetricProperty,owl:AsymmetricProperty,
+    owl:ReflexiveProperty,owl:IrreflexiveProperty,
+    owl:FunctionalProperty,owl:InverseFunctionalProperty,
+    owl:ObjectProperty,owl:DatatypeProperty,owl:NamedIndividual,
+    owl:minCardinality,owl:maxCardinality,owl:cardinality,
+    owl:minQualifiedCardinality,owl:maxQualifiedCardinality,
+    owl:qualifiedCardinality,owl:onClass,owl:onDataRange,owl:onDatatype,
+    owl:withRestrictions,xsd:integer,xsd:string,xsd:boolean,
+    xsd:nonNegativeInteger,xsd:minInclusive,xsd:maxInclusive},
+  sensitive=true,
+  morecomment=[l]{\#},
+  morestring=[b]",
+}
+
+\lstset{
+  language=turtle,
+  basicstyle=\ttfamily\footnotesize,
+  keywordstyle=\color{ttlkeyword},
+  commentstyle=\color{ttlcomment}\itshape,
+  stringstyle=\color{ttlstring},
+  backgroundcolor=\color{ttlbg},
+  frame=leftline,
+  framesep=6pt,
+  xleftmargin=10pt,
+  rulecolor=\color{gray},
+  breaklines=true,
+  columns=fullflexible,
+  keepspaces=true,
+  showstringspaces=false,
+  aboveskip=6pt,
+  belowskip=6pt,
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Shorthands for DL notation
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\dl}[1]{\ensuremath{\mathcal{#1}}}
+\newcommand{\ALC}{\dl{ALC}}
+\newcommand{\EL}{\dl{EL}}
+\newcommand{\AL}{\dl{AL}}
+\newcommand{\SROIQ}{\dl{SROIQ}}
+\newcommand{\SHOIN}{\dl{SHOIN}}
+\newcommand{\SHIF}{\dl{SHIF}}
+\newcommand{\dllite}[1]{\ensuremath{\textit{DL-Lite}_{#1}}}
+\newcommand{\dlliteplain}{\textit{DL-Lite}}
+\newcommand{\cn}[1]{\mathsf{#1}}      % concept name
+\newcommand{\rn}[1]{\mathsf{#1}}      % role name
+\newcommand{\ind}[1]{\mathsf{#1}}     % individual name
+\newcommand{\sub}{\sqsubseteq}
+\newcommand{\eqv}{\equiv}
+\newcommand{\inv}[1]{#1^{-}}
+
+% Environment pairing a DL axiom with its OWL serialisation
+\newcommand{\dlaxiom}[1]{%
+  \begin{displaymath}#1\end{displaymath}}
+
+\title{Expressivity of Description Logics\\and the Corresponding OWL Profiles}
+\author{}
+\date{}
+
+\begin{document}
+\maketitle
+\vspace{-2\baselineskip}
+
+\begin{abstract}
+\noindent This document gives a letter-by-letter account of Description Logic (DL)
+naming conventions. For each label it provides a description of the constructor,
+an example axiom in DL syntax, and the corresponding OWL~2 encoding in Turtle.
+It closes with the mapping between named DLs and OWL species, with a
+comparison of the three OWL~2 profiles, with an analysis of the rule-based
+entailment regimes offered by GraphDB --- including an empirical check of what
+each ruleset actually infers --- and with a survey of openly available
+reasoners.
+\end{abstract}
+
+\begin{center}
+\footnotesize
+\textbf{DL identifiers at a glance}\\[4pt]
+\begin{tabular}{@{}clll@{}}
+\toprule
+\textbf{Id} & \textbf{Construct} & \textbf{DL syntax} & \textbf{OWL~2 vocabulary}\\
+\midrule
+\multicolumn{4}{@{}l}{\emph{Base languages}}\\
+\AL{} & attributive language & $\top, \bot, \neg A, C \sqcap D, \forall R.C, \exists R.\top$
+  & \texttt{intersectionOf}, \texttt{allValuesFrom}, \dots\\
+\EL{} & existential language & $\top, C \sqcap D, \exists R.C$
+  & \texttt{intersectionOf}, \texttt{someValuesFrom}\\
+\dl{FL}$_0$ & frame language & $C \sqcap D, \forall R.C$
+  & \texttt{intersectionOf}, \texttt{allValuesFrom}\\
+\dl{S} & \ALC{} + transitive roles & $\ALC$, $\mathsf{Trans}(R)$
+  & \texttt{TransitiveProperty}\\
+\midrule
+\multicolumn{4}{@{}l}{\emph{Constructor letters}}\\
+\dl{C} & complex negation & $\neg C$ & \texttt{complementOf}\\
+\dl{U} & union & $C \sqcup D$ & \texttt{unionOf}\\
+\dl{E} & full existential & $\exists R.C$ & \texttt{someValuesFrom}\\
+\dl{H} & role hierarchy & $R \sub S$ & \texttt{subPropertyOf}\\
+\dl{R} & complex role inclusions & $R_1 \circ R_2 \sub S$, $\exists R.\mathsf{Self}$
+  & \texttt{propertyChainAxiom}, \texttt{hasSelf}\\
+\dl{O} & nominals & $\{a, b\}$ & \texttt{oneOf}, \texttt{hasValue}\\
+\dl{I} & inverse roles & $\inv{R}$ & \texttt{inverseOf}\\
+\dl{N} & unqualified cardinality & ${\geq}n\,R$, ${\leq}n\,R$
+  & \texttt{min/maxCardinality}\\
+\dl{Q} & qualified cardinality & ${\geq}n\,R.C$, ${\leq}n\,R.C$
+  & \texttt{min/maxQualifiedCardinality}\\
+\dl{F} & functional roles & $\top \sub {\leq}1\,R$
+  & \texttt{FunctionalProperty}\\
+$(\mathcal{D})$ & datatypes & $\exists U.d$, facets
+  & \texttt{DatatypeProperty}, \texttt{withRestrictions}\\
+\midrule
+\multicolumn{4}{@{}l}{\emph{Families}}\\
+\dlliteplain{} & FOL-rewritable fragments & $B \sub C$, $B ::= A \mid \exists R$
+  & OWL~2~QL ($\dllite{\mathcal{R}}$)\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\newpage
+\tableofcontents
+\bigskip
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{How the naming works}
+
+A DL name is built by concatenating letters: a \emph{base language}
+(\AL{}, \EL{}, \dl{FL}, or the shorthand \dl{S}) followed by one letter per
+additional constructor. Thus
+\[
+  \SROIQ^{(\mathcal{D})} \;=\;
+  \underbrace{\dl{S}}_{\ALC + \text{trans.}} +
+  \underbrace{\dl{R}}_{\text{role axioms}} +
+  \underbrace{\dl{O}}_{\text{nominals}} +
+  \underbrace{\dl{I}}_{\text{inverses}} +
+  \underbrace{\dl{Q}}_{\text{qual.\ card.}} +
+  \underbrace{(\mathcal{D})}_{\text{datatypes}} .
+\]
+Throughout, $A$ denotes an atomic concept (class name), $C, D$ arbitrary concept
+expressions, $R, S$ roles (properties), and $a, b$ individuals.
+All Turtle snippets assume the usual \texttt{rdf:}, \texttt{rdfs:},
+\texttt{owl:}, \texttt{xsd:} prefixes and a local prefix \texttt{:}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Base languages}
+
+\subsection*{\dl{FL}$_0$ / \dl{FL}$^-$ --- frame-based languages}
+\dl{FL}$_0$ offers conjunction and value restriction only; \dl{FL}$^-$ adds the
+limited existential $\exists R.\top$. Both are of mainly historical interest and
+neither corresponds to a named OWL fragment.
+\dlaxiom{\cn{Parent} \sub \cn{Person} \sqcap \forall \rn{hasChild}.\cn{Person}}
+
+\subsection*{\AL{} --- Attributive Language}
+The classical baseline: atomic concepts, $\top$, $\bot$, \emph{atomic} negation
+(only $\neg A$ for a class name $A$), conjunction, value restriction
+$\forall R.C$, and \emph{unqualified} existential $\exists R.\top$.
+\dlaxiom{\cn{Parent} \sub \cn{Person} \sqcap \neg\cn{Robot} \sqcap
+  \forall \rn{hasChild}.\cn{Person} \sqcap \exists \rn{hasChild}.\top}
+\begin{lstlisting}
+:Parent rdfs:subClassOf [
+  a owl:Class ;
+  owl:intersectionOf (
+    :Person
+    [ a owl:Class ; owl:complementOf :Robot ]
+    [ a owl:Restriction ; owl:onProperty :hasChild ;
+      owl:allValuesFrom :Person ]
+    [ a owl:Restriction ; owl:onProperty :hasChild ;
+      owl:someValuesFrom owl:Thing ]
+  )
+] .
+\end{lstlisting}
+
+\subsection*{\EL{} --- Existential Language}
+$\top$, conjunction, and \emph{full} existential restriction $\exists R.C$.
+No negation, no disjunction, no value restriction. This is the base of OWL~2~EL.
+\dlaxiom{\cn{Parent} \eqv \cn{Person} \sqcap \exists \rn{hasChild}.\cn{Person}}
+\begin{lstlisting}
+:Parent owl:equivalentClass [
+  a owl:Class ;
+  owl:intersectionOf (
+    :Person
+    [ a owl:Restriction ; owl:onProperty :hasChild ;
+      owl:someValuesFrom :Person ]
+  )
+] .
+\end{lstlisting}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Constructor letters}
+
+\subsection*{\dl{C} --- complex (full) concept negation}
+Negation of arbitrary concept expressions, not just of class names.
+$\AL + \dl{C} = \ALC$, which is closed under the Boolean operators; hence
+\dl{U} and \dl{E} come for free.
+\dlaxiom{\cn{Childless} \eqv \neg \exists \rn{hasChild}.\top}
+\begin{lstlisting}
+:Childless owl:equivalentClass [
+  a owl:Class ;
+  owl:complementOf [ a owl:Restriction ;
+                     owl:onProperty :hasChild ;
+                     owl:someValuesFrom owl:Thing ]
+] .
+\end{lstlisting}
+
+\subsection*{\dl{U} --- concept union}
+Disjunction of concept expressions. Redundant once \dl{C} is available
+(De Morgan), which is why it rarely appears in modern names.
+\dlaxiom{\cn{Person} \eqv \cn{Man} \sqcup \cn{Woman}}
+\begin{lstlisting}
+:Person owl:equivalentClass [
+  a owl:Class ; owl:unionOf ( :Man :Woman )
+] .
+\end{lstlisting}
+
+\subsection*{\dl{E} --- full existential restriction}
+$\exists R.C$ with an arbitrary filler, as opposed to \AL{}'s
+$\exists R.\top$. Also redundant given \dl{C} and $\forall$.
+\dlaxiom{\cn{Researcher} \sub \exists \rn{worksFor}.\cn{Institution}}
+\begin{lstlisting}
+:Researcher rdfs:subClassOf [
+  a owl:Restriction ; owl:onProperty :worksFor ;
+  owl:someValuesFrom :Institution
+] .
+\end{lstlisting}
+
+\subsection*{\dl{S} --- shorthand for $\ALC$ with transitive roles}
+Not a constructor but an abbreviation for $\ALC_{R^+}$. Nearly every
+practically relevant DL name starts with it.
+\dlaxiom{\rn{hasAncestor} \circ \rn{hasAncestor} \sub \rn{hasAncestor}}
+\begin{lstlisting}
+:hasAncestor a owl:TransitiveProperty .
+\end{lstlisting}
+
+\subsection*{\dl{H} --- role hierarchy}
+Subsumption between roles.
+\dlaxiom{\rn{hasMother} \sub \rn{hasParent}}
+\begin{lstlisting}
+:hasMother rdfs:subPropertyOf :hasParent .
+\end{lstlisting}
+
+\subsection*{\dl{R} --- complex role inclusions (subsumes \dl{H})}
+General role chains, subject to a regularity (acyclicity) condition, plus
+reflexive, irreflexive and disjoint roles and local reflexivity
+$\exists R.\mathsf{Self}$.
+\begin{align*}
+  \rn{hasParent} \circ \rn{hasParent} &\sub \rn{hasGrandparent}\\
+  \mathsf{Disj}(\rn{hasParent}&, \rn{hasSpouse})\\
+  \cn{Narcissist} &\eqv \exists \rn{loves}.\mathsf{Self}
+\end{align*}
+\begin{lstlisting}
+:hasGrandparent owl:propertyChainAxiom ( :hasParent :hasParent ) .
+:hasParent owl:propertyDisjointWith :hasSpouse .
+:hasPart   a owl:ReflexiveProperty .
+:hasParent a owl:IrreflexiveProperty .
+
+:Narcissist owl:equivalentClass [
+  a owl:Restriction ; owl:onProperty :loves ;
+  owl:hasSelf "true"^^xsd:boolean
+] .
+\end{lstlisting}
+
+\subsection*{\dl{O} --- nominals}
+Individuals used inside concept expressions: enumerations $\{a,b,c\}$ and the
+singleton case $\exists R.\{a\}$.
+\begin{align*}
+  \cn{Continent} &\eqv \{\ind{Africa}, \ind{Americas}, \ind{Antarctica},
+                        \ind{Asia}, \ind{Europe}, \ind{Oceania}\}\\
+  \cn{Italian} &\eqv \exists \rn{hasNationality}.\{\ind{Italy}\}
+\end{align*}
+\begin{lstlisting}
+:Continent owl:equivalentClass [
+  a owl:Class ;
+  owl:oneOf ( :Africa :Americas :Antarctica :Asia :Europe :Oceania )
+] .
+
+:Italian owl:equivalentClass [
+  a owl:Restriction ; owl:onProperty :hasNationality ;
+  owl:hasValue :Italy
+] .
+\end{lstlisting}
+
+\subsection*{\dl{I} --- inverse roles}
+$\inv{R}$ as a role expression, usable wherever a role name is.
+\begin{align*}
+  \rn{hasChild} &\eqv \inv{\rn{hasParent}}\\
+  \cn{Child} &\sub \exists \inv{\rn{hasChild}}.\cn{Person}
+\end{align*}
+\begin{lstlisting}
+:hasChild owl:inverseOf :hasParent .
+
+:Child rdfs:subClassOf [
+  a owl:Restriction ;
+  owl:onProperty [ owl:inverseOf :hasChild ] ;
+  owl:someValuesFrom :Person
+] .
+\end{lstlisting}
+
+\subsection*{\dl{N} --- unqualified cardinality restrictions}
+$\geq n\,R$, $\leq n\,R$, $=\,n\,R$ with no filler (implicitly $\top$).
+\dlaxiom{\cn{Person} \sub {\leq}\,2\ \rn{hasParent}}
+\begin{lstlisting}
+:Person rdfs:subClassOf [
+  a owl:Restriction ; owl:onProperty :hasParent ;
+  owl:maxCardinality "2"^^xsd:nonNegativeInteger
+] .
+\end{lstlisting}
+
+\subsection*{\dl{Q} --- qualified cardinality restrictions}
+$\geq n\,R.C$: the filler is constrained. Strictly more expressive than \dl{N}
+(which is \dl{Q} with $C = \top$). Introduced in OWL~2.
+\dlaxiom{\cn{Hand} \sub {\geq}\,5\ \rn{hasPart}.\cn{Finger}}
+\begin{lstlisting}
+:Hand rdfs:subClassOf [
+  a owl:Restriction ; owl:onProperty :hasPart ;
+  owl:minQualifiedCardinality "5"^^xsd:nonNegativeInteger ;
+  owl:onClass :Finger
+] .
+\end{lstlisting}
+
+\subsection*{\dl{F} --- functional roles}
+The special case $\top \sub {\leq}\,1\,R$. Weaker than \dl{N}; present in
+$\SHIF$ (OWL~Lite) precisely to keep complexity down.
+\begin{align*}
+  \top &\sub {\leq}\,1\ \rn{hasBiologicalMother}\\
+  \top &\sub {\leq}\,1\ \inv{\rn{hasSSN}}
+\end{align*}
+\begin{lstlisting}
+:hasBiologicalMother a owl:FunctionalProperty .
+:hasSSN a owl:InverseFunctionalProperty .
+\end{lstlisting}
+
+\subsection*{$(\mathcal{D})$ --- concrete domains / datatypes}
+Datatype properties and datatype ranges, including facet restrictions.
+\dlaxiom{\cn{Adult} \eqv \cn{Person} \sqcap \exists \rn{hasAge}.({\geq}18)}
+\begin{lstlisting}
+:Adult owl:equivalentClass [
+  a owl:Class ;
+  owl:intersectionOf (
+    :Person
+    [ a owl:Restriction ; owl:onProperty :hasAge ;
+      owl:someValuesFrom [
+        a rdfs:Datatype ;
+        owl:onDatatype xsd:integer ;
+        owl:withRestrictions ( [ xsd:minInclusive 18 ] )
+      ]
+    ]
+  )
+] .
+\end{lstlisting}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{The \dlliteplain{} family}
+\label{sec:dllite}
+
+\dlliteplain{} does not fit the letter-concatenation scheme of the previous
+sections, and that is deliberate. The families above were obtained
+\emph{top-down}, by starting from a rich logic and asking how much can be
+retained while decidability holds. \dlliteplain{} was designed \emph{bottom-up}
+(Calvanese et al., \emph{JAR} 2007) against a single criterion: conjunctive
+query answering must remain \emph{first-order rewritable}, i.e.\ reducible to
+the evaluation of an SQL query over the data alone. Every restriction below
+follows from that criterion rather than from a menu of constructors.
+
+\subsection*{Syntax}
+
+The language is built from \emph{basic} concepts and roles:
+\begin{align*}
+  B &::= A \;\mid\; \exists R          &&\text{basic concept}\\
+  R &::= P \;\mid\; \inv{P}            &&\text{basic role}\\
+  C &::= B \;\mid\; \neg B             &&\text{general concept}\\
+  E &::= R \;\mid\; \neg R             &&\text{general role}
+\end{align*}
+Here $\exists R$ is \emph{unqualified}: it abbreviates $\exists R.\top$.
+A TBox contains inclusions $B \sub C$ (and, in the extensions below,
+$R \sub E$); an ABox contains assertions $A(a)$ and $P(a,b)$.
+
+The asymmetry is the essential point. Only a \emph{basic} concept may occur on
+the left of $\sub$, and negation may occur only on the right. This guarantees
+that the ontology has a canonical model that can be folded into the query
+instead of being materialised over the data.
+
+\subsection*{$\dllite{\mathsf{core}}$ --- concept inclusions and disjointness}
+
+The common core: inclusions between basic concepts, plus disjointness.
+Domain and range assertions are not primitives but derived readings of
+$\exists P \sub A$ and $\exists \inv{P} \sub A$.
+\begin{align*}
+  \cn{Professor} &\sub \exists \rn{teaches}
+    &&\text{every professor teaches something}\\
+  \exists \rn{teaches} &\sub \cn{Professor}
+    &&\text{domain of } \rn{teaches}\\
+  \exists \inv{\rn{teaches}} &\sub \cn{Course}
+    &&\text{range of } \rn{teaches}\\
+  \cn{Professor} &\sub \neg\cn{Student}
+    &&\text{disjointness}
+\end{align*}
+\begin{lstlisting}
+:Professor rdfs:subClassOf [
+  a owl:Restriction ; owl:onProperty :teaches ;
+  owl:someValuesFrom owl:Thing
+] .
+
+:teaches rdfs:domain :Professor ;
+         rdfs:range  :Course .
+
+:Professor owl:disjointWith :Student .
+\end{lstlisting}
+
+\noindent
+Strictly, $\dllite{\mathcal{R}}$ has only the unqualified $\exists R$. OWL~2~QL
+nevertheless admits a qualified existential $\exists R.A$ in superclass
+position, because it is a conservative extension: $A \sub \exists R.B$ can be
+rewritten with a fresh role as
+$A \sub \exists R_B$, $R_B \sub R$, $\exists \inv{R_B} \sub B$.
+
+\subsection*{$\dllite{\mathcal{F}}$ --- functionality}
+
+Adds functionality assertions $(\mathsf{funct}\ R)$ on basic roles, inverses
+included. No role inclusions.
+\begin{align*}
+  \top &\sub {\leq}\,1\ \rn{hasSupervisor}
+    &&(\mathsf{funct}\ \rn{hasSupervisor})\\
+  \top &\sub {\leq}\,1\ \inv{\rn{hasMatricula}}
+    &&(\mathsf{funct}\ \inv{\rn{hasMatricula}})
+\end{align*}
+\begin{lstlisting}
+:hasSupervisor a owl:FunctionalProperty .
+:hasMatricula  a owl:InverseFunctionalProperty .
+\end{lstlisting}
+
+\subsection*{$\dllite{\mathcal{R}}$ --- role inclusions}
+
+Adds inclusions between roles, $R \sub E$, hence both role hierarchies and role
+disjointness. No functionality. This is the logic underlying OWL~2~QL.
+\begin{align*}
+  \rn{hasSupervisor} &\sub \rn{knows}\\
+  \inv{\rn{hasSupervisor}} &\sub \rn{supervises}\\
+  \rn{hasSupervisor} &\sub \neg\rn{hasStudent}
+\end{align*}
+\begin{lstlisting}
+:hasSupervisor rdfs:subPropertyOf :knows ;
+               owl:propertyDisjointWith :hasStudent .
+:supervises owl:inverseOf :hasSupervisor .
+\end{lstlisting}
+
+\subsection*{$\dllite{\mathcal{A}}$ --- combining the two, safely}
+
+Putting $\mathcal{F}$ and $\mathcal{R}$ together without care destroys the
+guarantee: with unrestricted interaction between functionality and role
+inclusions, conjunctive query answering is no longer FOL-rewritable and
+reasoning becomes ExpTime-hard (Artale et al., \emph{JAIR} 2009).
+$\dllite{\mathcal{A}}$ restores rewritability with a syntactic proviso:
+\begin{quote}
+  a functional role may never be specialised --- if $(\mathsf{funct}\ R)$ or
+  $(\mathsf{funct}\ \inv{R})$, then $R$ and $\inv{R}$ must not occur on the
+  right-hand side of any role inclusion.
+\end{quote}
+$\dllite{\mathcal{A}}$ also separates abstract objects from data values,
+distinguishing concepts and roles from \emph{attributes} and
+\emph{value-domains} --- the direct ancestor of OWL's split between object and
+datatype properties.
+
+This explains a design choice that otherwise looks arbitrary: OWL~2~QL keeps
+role inclusions and drops \texttt{owl:Functional\-Property} and
+\texttt{owl:Inverse\-Functional\-Property} altogether, rather than attempting to
+police the interaction at the profile level.
+
+\subsection*{The Horn and Boolean extensions}
+
+Artale et al.\ generalise the family along a second axis, by relaxing what may
+appear on the left of $\sub$ and which Boolean operators are available. The
+fragments retained for OWL~2~QL are the \emph{core} ones; the others show
+precisely what each relaxation costs.
+
+\begin{table}[h]
+\centering
+\footnotesize
+\begin{tabular}{@{}lllp{4.1cm}@{}}
+\toprule
+\textbf{Fragment} & \textbf{Satisfiability} & \textbf{CQ data compl.} &
+\textbf{Left-hand side of $\sub$}\\
+\midrule
+$\dllite{\mathsf{core}}$, $\dllite{\mathcal{F}}$, $\dllite{\mathcal{R}}$
+  & NLogSpace-complete & $AC^0$ & a single basic concept $B$\\
+$\dllite{\mathsf{krom}}$
+  & NLogSpace-complete & $AC^0$ & binary clauses ($B_1 \sub \neg B_2$ etc.)\\
+$\dllite{\mathsf{horn}}$
+  & PTime-complete & PTime & conjunction $B_1 \sqcap \dots \sqcap B_n$\\
+$\dllite{\mathsf{bool}}$
+  & NP-complete & coNP & arbitrary Boolean combination\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\noindent
+The jump from $AC^0$ to PTime at the Horn line is the one that matters in
+practice: it is exactly the point at which the TBox can no longer be compiled
+away into the query, and a reasoner must instead touch the data.
+
+\subsection*{Why FOL-rewritability is the point}
+
+Given a conjunctive query $q$ and a TBox $\mathcal{T}$, the \textsc{PerfectRef}
+algorithm rewrites $q$ into a union of conjunctive queries $q_{\mathcal{T}}$
+such that, for every ABox $\mathcal{A}$,
+\[
+  \mathsf{cert}(q, \langle \mathcal{T}, \mathcal{A}\rangle)
+  \;=\;
+  \mathsf{ans}(q_{\mathcal{T}}, \mathcal{A}),
+\]
+where the right-hand side evaluates $q_{\mathcal{T}}$ over $\mathcal{A}$ read as
+a plain relational database, with no reasoning at all. The ontology is compiled
+into the query, never into the data; the data may stay in an untouched legacy
+RDBMS behind a set of mappings. This is the basis of OBDA systems such as
+Mastro and Ontop, and the reason OWL~2~QL exists as a profile.
+
+The cost is paid elsewhere: the rewriting may grow exponentially in the size of
+the \emph{query} (though not of the data), which is why practical systems invest
+heavily in optimising and pruning $q_{\mathcal{T}}$.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Named DLs and their OWL counterparts}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Description Logic} & \textbf{OWL language} &
+\textbf{Complexity (concept sat.)}\\
+\midrule
+$\EL$ / $\EL^{++}$          & OWL~2~EL    & PTime-complete\\
+\dllite{\mathcal{R}}        & OWL~2~QL    & NLogSpace; $AC^0$ data compl.\ for CQs\\
+\dl{DLP} / $pD^*$-style     & OWL~2~RL    & PTime-complete\\
+$\ALC$                      & ---         & ExpTime-complete\\
+$\SHIF^{(\mathcal{D})}$     & OWL~1~Lite  & ExpTime-complete\\
+$\SHOIN^{(\mathcal{D})}$    & OWL~1~DL    & NExpTime-complete\\
+$\SROIQ^{(\mathcal{D})}$    & OWL~2~DL    & N2ExpTime-complete\\
+unrestricted, RDF semantics & OWL~2~Full  & undecidable\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\noindent
+Note that OWL~Lite, despite its name, is $\SHIF^{(\mathcal{D})}$: it has the same
+worst-case complexity as $\SHIF$, and most of OWL~DL can be encoded into it.
+This is why it was effectively abandoned in OWL~2.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{The three OWL 2 profiles}
+
+The profiles are \emph{pairwise incomparable} --- they do not form a chain.
+Each is a syntactic subset of OWL~2~DL designed to make a \emph{different}
+reasoning task tractable.
+
+\paragraph{OWL 2 EL ($\EL^{++}$).}
+Target: very large terminologies (SNOMED~CT, GO, NCIt).
+Retains $\sqcap$, $\exists R.C$, $\top$, $\bot$, nominals, role chains,
+$\mathsf{Self}$, domain and range, keys, datatypes.
+Drops $\forall R.C$, $\sqcup$, $\neg$, inverse roles, all cardinality
+restrictions, functional properties, and disjunctive reasoning.
+Classification is polynomial.
+
+\paragraph{OWL 2 QL (\dllite{\mathcal{R}}, see Section~\ref{sec:dllite}).}
+Target: query answering over large ABoxes stored in relational databases via
+rewriting (OBDA, Ontop). The syntax is asymmetric: on the left of $\sub$ one may
+use a class name or $\exists R.\top$; on the right, a class name,
+$\exists R.C$, or a negation. Drops $\sqcup$, $\exists R.C$ in subclass
+position, property chains, functional and transitive properties, nominals, and
+keys. Conjunctive queries are FOL-rewritable into SQL, giving $AC^0$ data
+complexity.
+
+\paragraph{OWL 2 RL.}
+Target: rule engines and forward chaining over RDF (partial axiomatisation as
+Datalog). Also asymmetric: subclass position allows $\sqcap$, $\sqcup$,
+$\exists R.C$ and nominals; superclass position allows $\sqcap$,
+$\forall R.C$, ${\leq}1\,R.C$, ${\leq}0\,R.C$ and negation. Drops
+$\exists R.C$ on the right (no existential blank-node generation) and $\sqcup$
+on the right. Keeps inverses, transitivity, functionality, property chains and
+keys. PTime data complexity, and it degrades gracefully: the RL rule set can be
+run over any RDF graph, including OWL~Full ones, at the cost of incompleteness.
+
+\begin{table}[h]
+\centering
+\footnotesize
+\begin{tabular}{@{}lccc@{}}
+\toprule
+\textbf{Construct} & \textbf{EL} & \textbf{QL} & \textbf{RL}\\
+\midrule
+$C \sqcap D$                       & yes & partial & yes\\
+$C \sqcup D$                       & no  & no      & subclass position only\\
+$\neg C$                           & no  & superclass position only & superclass position only\\
+$\exists R.C$                      & yes & superclass position only & subclass position only\\
+$\forall R.C$                      & no  & no      & superclass position only\\
+Nominals $\{a\}$                   & yes & no      & yes\\
+Inverse roles $\inv{R}$            & no  & yes     & yes\\
+Cardinality restrictions           & no  & no      & ${\leq}1$, ${\leq}0$ only\\
+Functional properties              & no  & no      & yes\\
+Transitive properties              & yes & no      & yes\\
+Property chains                    & yes & no      & yes\\
+$\exists R.\mathsf{Self}$          & yes & no      & no\\
+Keys                               & yes & no      & yes\\
+\midrule
+Data complexity                    & PTime & $AC^0$ & PTime\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Rule-based entailment in triple stores: the GraphDB rulesets}
+\label{sec:graphdb}
+
+Triple stores rarely embed a DL reasoner. GraphDB, like most of them, offers
+entailment through \emph{rulesets}: \texttt{empty}, \texttt{rdfs},
+\texttt{rdfsplus}, \texttt{owl-horst}, \texttt{owl-max}, \texttt{owl2-ql} and
+\texttt{owl2-rl}, each also available as an \texttt{-optimized} variant.
+The names suggest a correspondence with the languages of the previous
+sections, but the correspondence is loose, for three reasons.
+
+\begin{itemize}
+  \item \textbf{The engine is a rule engine.} Each ruleset is a set of Horn
+    rules (in GraphDB's \texttt{.pie} format) applied by forward chaining; the
+    closure is fully materialised at load time.
+  \item \textbf{The semantics is RDF-based.} Rules match triples, not axioms;
+    classes may be instances, and no Direct-Semantics interpretation is
+    involved.
+  \item \textbf{There is no syntactic check.} A ruleset is applied to any
+    graph, whether or not it lies in the corresponding profile or DL.
+\end{itemize}
+
+\noindent
+The consequence is that none of the rulesets implements a full description
+logic. Each is best understood as a \emph{Horn fragment} of some DL: sound, but
+incomplete with respect to the full logic whose vocabulary it accepts.
+
+\subsection*{Mapping to DL families}
+
+\begin{table}[h]
+\centering
+\footnotesize
+\begin{tabular}{@{}llp{6.4cm}@{}}
+\toprule
+\textbf{GraphDB ruleset} & \textbf{Closest DL / profile} &
+\textbf{DL axioms covered}\\
+\midrule
+\texttt{rdfs}
+  & $\rho$df $\subset \dllite{\mathcal{R}}$
+  & $A \sub B$, $P \sub Q$, $\exists P \sub A$ (domain),
+    $\exists \inv{P} \sub A$ (range)\\
+\texttt{rdfsplus}
+  & Horn fragment of \dl{SHI} ($\approx$ DLP)
+  & $+$ $P \eqv \inv{Q}$, $P \eqv \inv{P}$ (symmetry), $\mathsf{Trans}(P)$\\
+\texttt{owl-horst}
+  & $pD^*$ $\approx$ Horn-\dl{SHOIF}
+  & $+$ $a \approx b$, $\mathsf{Func}(P)$, $\mathsf{Func}(\inv{P})$,
+    $\exists P.C \sub A$, $A \sub \forall P.C$, $A \eqv \exists P.\{o\}$,
+    $A \eqv B$\\
+\texttt{owl-max}
+  & Horn fragment of $\SHIF^{(\mathcal{D})}$ (OWL~Lite syntax)
+  & $+$ $B \sqcup C \sub A$, intersections, ${\leq}1\,P$\\
+\texttt{owl2-rl}
+  & OWL~2~RL $\subset$ Horn-$\SROIQ^{(\mathcal{D})}$
+  & $+$ property chains, keys, disjoint properties, qualified ${\leq}1$\\
+\texttt{owl2-ql}
+  & OWL~2~QL $\approx \dllite{\mathcal{R}}$
+  & $A \sub B$, $A \sub \exists P.B$, role inclusions, inverses,
+    disjointness\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\noindent
+The reference points are $\SHIF^{(\mathcal{D})}$ for OWL~Lite,
+$\SHOIN^{(\mathcal{D})}$ for OWL~1~DL and $\SROIQ^{(\mathcal{D})}$ for OWL~2~DL.
+GraphDB ships no ruleset for OWL~2~EL.
+
+\subsection*{Why every ruleset is a Horn fragment}
+
+Two limitations are shared by all rulesets, and together they account for most
+of the distance from the full logics.
+
+\begin{itemize}
+  \item \textbf{No disjunctive consequences.} A rule can derive $A(a)$ but never
+    $A(a) \lor B(a)$. For a union
+    $\cn{Staff} \eqv \cn{Academic} \sqcup \cn{TechnicalStaff}$ only the
+    direction $\cn{Academic} \sub \cn{Staff}$ is usable; the converse, which a
+    tableau would exploit by case analysis, is lost.
+  \item \textbf{No new individuals.} Rules never invent a witness. An axiom
+    $A \sub \exists P.B$ is accepted and stored, but it yields no
+    $P$-successor, and nothing that would follow from one.
+\end{itemize}
+
+\subsection*{Ruleset by ruleset}
+
+\paragraph{RDFS.} Not a DL at all, since it permits metamodelling. Its
+DL-expressible part is a small subset of both $\dllite{\mathcal{R}}$ and \EL{}.
+
+\paragraph{RDFS-Plus.} Adds the role axioms of \dl{SHI} --- inverse and
+transitive roles on top of the role hierarchy --- but no new concept
+constructors. It lies within Description Logic Programs, the intersection of
+DL and Horn logic identified by Grosof et al.\ (WWW 2003).
+
+\paragraph{OWL-Horst.} Ter Horst's $pD^*$ (\emph{JWS} 2005) was defined as a
+semantic extension of RDFS with an ``if''-semantics for the OWL vocabulary, not
+as a DL. Its constructors roughly cover Horn-\dl{SHOIF}: \texttt{owl:hasValue}
+contributes nominals, functional and inverse-functional properties contribute
+\dl{F}. It is sound but incomplete for \SHOIN{}. GraphDB's implementation goes
+beyond textbook $pD^*$ in handling \texttt{owl:intersectionOf} in both
+directions (see the empirical check below).
+
+\paragraph{OWL-Max.} Accepts OWL~Lite, i.e.\ $\SHIF^{(\mathcal{D})}$, syntax, but
+derives only its Horn-expressible consequences. Relative to OWL-Horst it adds,
+chiefly, the subclass direction of \texttt{owl:unionOf}, rule-expressible
+cardinality (above all ${\leq}1$, which behaves as a local functionality
+constraint and so produces \texttt{owl:sameAs}), and further consistency
+checks. The exact rule difference is version-dependent; the authoritative
+source is a diff of the two \texttt{.pie} files.
+
+\paragraph{OWL 2 RL.} The W3C profile was itself derived from DLP and $pD^*$.
+On ontologies that satisfy the RL syntactic restrictions, the RL/RDF rules are
+sound and complete for ground atomic consequences (Theorem~PR1 of the OWL~2
+Profiles specification); outside them they remain sound but incomplete. Data
+complexity is polynomial.
+
+\paragraph{OWL 2 QL.} The $\dllite{\mathcal{R}}$ profile of
+Section~\ref{sec:dllite}, designed for query rewriting with $AC^0$ data
+complexity. GraphDB does \emph{not} rewrite: it materialises the QL
+consequences instead, which forgoes the main benefit of the profile and, as the
+empirical check shows, produces far more implicit triples than the other
+rulesets. The ruleset is also more permissive than the profile.
+
+\subsection*{The \texttt{-optimized} variants}
+
+According to the GraphDB documentation, the optimised rulesets remove
+inferences that matter for formal completeness but are rarely queried: the
+axiomatic triples and rule conclusions involving \texttt{rdfs:Resource}, and
+a handful of further axiomatic triples (e.g.\ \texttt{owl:sameAs} typed as
+symmetric and transitive). The documented list does \emph{not} include domain
+and range rules --- which makes the first finding below unexpected.
+
+\subsection*{Empirical check}
+
+The claims above were tested on a small university knowledge graph that
+exercises one construct per axiom block, loaded into four repositories
+(\texttt{rdfsplus-optimized}, \texttt{owl-horst-optimized},
+\texttt{owl-max-optimized}, \texttt{owl2-ql-optimized}; \texttt{owl:sameAs}
+enabled) and queried with inference switched on. The key trick is an
+individual with no asserted type, whose every class membership must therefore
+be inferred:
+\begin{lstlisting}
+ex:teaches a owl:ObjectProperty ;
+           rdfs:domain ex:Academic ; rdfs:range ex:Course .
+ex:alice   ex:teaches ex:kg101 .     # no rdf:type for ex:alice
+\end{lstlisting}
+
+\begin{table}[h]
+\centering
+\footnotesize
+\newcommand{\tyes}{$\checkmark$}
+\newcommand{\tno}{$\times$}
+\begin{tabular}{@{}llcccc@{}}
+\toprule
+& \textbf{Construct tested} & \textbf{RDFS-Plus} & \textbf{Horst} &
+  \textbf{Max} & \textbf{QL}\\
+\midrule
+Q1 & domain, subclass                        & \tno$^{a}$ & \tyes & \tyes & \tyes\\
+Q2 & subproperty, range                      & \tno$^{a}$ & \tyes & \tyes & \tyes\\
+Q3 & inverse, symmetric                      & \tyes & \tyes & \tyes & \tyes\\
+Q3 & transitive                              & \tyes & \tyes & \tyes & \tno\\
+Q4 & equivalent class / property            & --$^{b}$ & \tyes & \tyes & \tyes\\
+Q5 & sameAs via (inverse-)functional prop.   & \tno & \tyes & \tyes & \tno\\
+Q6 & hasValue, someValuesFrom, allValuesFrom & \tno & \tyes & \tyes & \tno\\
+Q7 & intersection, subclass side             & \tno & \tyes$^{c}$ & \tyes & \tyes$^{d}$\\
+Q7 & intersection, superclass side           & \tno & \tyes & \tyes & \tyes\\
+Q7 & union, subclass side                    & \tno & \tno & \tyes & \tno\\
+Q8 & property chain                          & \tno & \tno & \tno & \tno\\
+Q9 & keys                                    & \tno & \tno & \tno & \tno\\
+\midrule
+Q10 & implicit triples                      & 193 & 337 & 361 & 1596\\
+\bottomrule
+\end{tabular}
+
+\smallskip
+\raggedright
+$^{a}$~unexpected, see below.\quad
+$^{b}$~not observable: the query depends on the domain inference.\\
+$^{c}$~beyond textbook $pD^*$.\quad
+$^{d}$~beyond the OWL~2~QL profile.
+\end{table}
+
+\noindent
+Most results match the analysis. The OWL-Horst and OWL-Max columns agree
+everywhere except on union, which confirms both the inclusion between the two
+and that union is the only difference this test bed exposes. Property values
+stated on an alias propagate across \texttt{owl:sameAs}. OWL~2~QL has no
+transitivity, no equality and no \texttt{hasValue}, and does not derive the
+qualified existential on the subclass side. Q8 and Q9 are empty everywhere
+simply because no \texttt{owl2-rl} repository was part of the run; that
+ruleset should return the chained affiliations and the key-based equality.
+
+Four observations deviate from expectations.
+\begin{enumerate}
+  \item \textbf{\texttt{rdfsplus-optimized} applies neither domain nor
+    range.} Inverse, symmetric and transitive properties work, and
+    equivalent classes are turned into subclass links, so the ruleset is
+    active; yet \texttt{ex:alice} receives no type and \texttt{ex:kg101} is
+    never a course. An earlier run on an RDFS repository showed the same
+    symptom. Nothing in the documentation of the optimised variants accounts
+    for it. To be confirmed by querying range and subproperty inferences
+    separately, and by repeating the run on the non-optimised ruleset.
+  \item \textbf{OWL-Horst supports intersection in both directions}, which
+    textbook $pD^*$ does not.
+  \item \textbf{OWL~2~QL derives membership in an intersection} (an individual
+    typed with both conjuncts becomes an instance of the intersection class),
+    a subclass-side use that $\dllite{\mathcal{R}}$ does not allow.
+  \item \textbf{OWL~2~QL materialises almost five times as much as OWL-Max},
+    partly because it types every individual as \texttt{owl:Thing}, which the
+    other optimised rulesets do not.
+\end{enumerate}
+
+\subsection*{Practical consequences}
+
+\begin{itemize}
+  \item \textbf{Names are not guarantees.} A ruleset may be weaker than its
+    name suggests (RDFS-Plus above) or stronger than the profile it is named
+    after (OWL-Horst, OWL~2~QL). Test the constructs an application relies on,
+    rather than inferring support from the ruleset name.
+  \item \textbf{DL-illegal input is silently accepted.} An
+    \texttt{owl:InverseFunctionalProperty} on a datatype property is outside
+    \SHOIN{} and \SROIQ{}, yet it produces \texttt{owl:sameAs} in every ruleset
+    that handles inverse functionality.
+  \item \textbf{The gap to a DL reasoner is measurable.} Running the same
+    ontology through HermiT or Konclude (or ELK for its EL part) and comparing
+    inferred class assertions isolates exactly the consequences that need
+    disjunctive or existential reasoning.
+  \item \textbf{Materialisation cost varies sharply between rulesets}, and is
+    not monotone in apparent expressivity, as the QL figure shows.
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Openly available reasoners}
+\label{sec:reasoners}
+
+The sections above describe languages; this one describes what is actually
+implemented. Three warnings before the tables.
+
+\emph{First, ``supports \dl{X}'' is a claim about the calculus, not about the
+code.} Most systems implement a strict subset of the logic they advertise, and
+the gap is usually in datatypes, nominals or the more exotic role axioms. The
+\emph{Notes} column flags the cases where the gap is large enough to change a
+tool choice.
+
+\emph{Second, expressivity is rarely the binding constraint in practice.}
+Maintenance is. A systematic 2023 review of the field found that fewer than half
+of the analysed reasoners had seen any development activity in the preceding
+three years, and that several of the best-known names --- HermiT among them ---
+were effectively abandoned while remaining in daily use for want of
+alternatives (Abicht, arXiv:2309.06888).
+
+\emph{Third, the comparative evidence is dated.} The last edition of the OWL
+Reasoner Evaluation competition was ORE~2015 (Parsia et al., \emph{JAR} 2017);
+there has been no comparable successor, so performance claims newer than that
+rest on individual papers rather than on a common benchmark.
+
+\subsection*{OWL 2 DL: the $\SROIQ$ tier}
+
+\begin{table}[h]
+\centering
+\footnotesize
+\begin{tabular}{@{}lllp{4.5cm}@{}}
+\toprule
+\textbf{Reasoner} & \textbf{Expressivity} & \textbf{Method} & \textbf{Notes}\\
+\midrule
+Konclude & $\SROIQ\mathcal{V}^{(\mathcal{D})}$ & tableau + saturation
+  & C++/Qt, LGPLv3. $\mathcal{V}$ = nominal schemas, i.e.\ DL-safe rules in
+    ontology syntax. Won most DL tracks of ORE~2015\\
+HermiT & $\SROIQ^{(\mathcal{D})}$ & hypertableau
+  & Java, LGPL. Upstream dead since 1.3.8; the living artefact is the OWL~API
+    fork, explicitly unsupported by its authors. Ships with Prot\'eg\'e\\
+FaCT++ & $\SROIQ^{(\mathcal{D})}$ & optimised tableau
+  & C++, LGPL. Last commit 2017; still ships with Prot\'eg\'e\\
+JFact & $\SROIQ^{(\mathcal{D})}$ & tableau
+  & Java port of FaCT++, maintained under the OWL~API umbrella\\
+Openllet & $\SROIQ^{(\mathcal{D})}$ & tableau
+  & Java. Community fork of Pellet; sporadic but real updates\\
+Pellet & $\SROIQ^{(\mathcal{D})}$ & tableau
+  & Java. Historically important, abandoned; use Openllet instead\\
+Sequoia & $\dl{SRIQ}$ & consequence-based
+  & Scala, GPL-3. No nominals --- the trade for consequence-based
+    scalability at high expressivity\\
+Racer & $\dl{SRIQ}^{(\mathcal{D})}$ & tableau
+  & Common Lisp, BSD-3. Source on GitHub, project abandoned\\
+Vampire & FOL & superposition
+  & C++. A general theorem prover; OWL~DL reached by translation, not a
+    native OWL tool\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\noindent
+For new work at this tier the realistic choices are Konclude, which is the
+fastest and the only one under active development, and HermiT, which is native
+to the OWL API and ubiquitous but unmaintained. Everything else is either a
+fork of one of these or of historical interest only.
+
+\subsection*{OWL 2 EL: the $\EL^{++}$ tier}
+
+\begin{table}[h]
+\centering
+\footnotesize
+\begin{tabular}{@{}lllp{4.5cm}@{}}
+\toprule
+\textbf{Reasoner} & \textbf{Expressivity} & \textbf{Method} & \textbf{Notes}\\
+\midrule
+ELK & $\EL^{++}$, safe nominals & concurrent consequence-based
+  & Java, Apache~2.0. Partial support only for datatypes, $\neg$ and $\sqcup$;
+    incremental reclassification. The de-facto standard for biomedical
+    terminologies\\
+jcel & $\EL^{+}$ & completion rules
+  & Java. Subset of OWL~2~EL, Prot\'eg\'e plugin\\
+CEL & $\EL^{+}$ & completion rules
+  & The original large-scale EL reasoner; now of mainly historical interest\\
+ElepHant & $\EL^{+}$ & consequence-based
+  & C. Built for small memory and CPU budgets, e.g.\ embedded use\\
+Whelk & $\EL$ + RL & consequence-based
+  & Scala. Designed for large EL TBoxes combined with RL-shaped ABoxes;
+    integrated with ROBOT in the OBO toolchain\\
+Snorocket & OWL~2~EL subset & completion rules
+  & Java. Adds concrete domains; developed around SNOMED~CT tooling\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\noindent
+ELK's own documentation is unusually honest about its boundaries: the supported
+fragment is $\EL^{++}$ restricted to \emph{safe} nominals, with only partial
+support for concrete roles, \texttt{Object\-Complement\-Of} and
+\texttt{Object\-Union\-Of}, and it warns about unsupported constructs at load time
+rather than failing silently. An ontology that is valid OWL~2~EL on paper may
+therefore still be classified incompletely --- worth checking before attributing
+a missing inference to a modelling error.
+
+\subsection*{OWL 2 QL: query rewriting and OBDA}
+
+\begin{table}[h]
+\centering
+\footnotesize
+\begin{tabular}{@{}lllp{4.5cm}@{}}
+\toprule
+\textbf{Reasoner} & \textbf{Expressivity} & \textbf{Method} & \textbf{Notes}\\
+\midrule
+Ontop & $\dllite{\mathcal{R}}$ + RDFS & rewriting to SQL
+  & Java, Apache~2.0, actively developed (5.5.0, February 2026). SPARQL over
+    virtual knowledge graphs via R2RML mappings; the reference OBDA system\\
+Mastro & $\dllite{\mathcal{A}}$ & rewriting to SQL
+  & Sapienza. Academic licence, not open source\\
+Clipper & Horn-$\dl{SHIQ}$ & rewriting to Datalog
+  & Java. Above QL in expressivity but still rewritable; abandoned, and its
+    Datalog back end (DLV) is no longer distributed\\
+Requiem & $\dl{ELHIO}$ & resolution-based rewriting
+  & Prototype accompanying the rewriting algorithm; not maintained\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\noindent
+This tier is effectively a single-vendor landscape: Ontop is the only openly
+available, maintained implementation of the rewriting approach described in
+Section~\ref{sec:dllite}.
+
+\subsection*{OWL 2 RL: rules and materialisation}
+
+\begin{table}[h]
+\centering
+\footnotesize
+\begin{tabular}{@{}lllp{4.5cm}@{}}
+\toprule
+\textbf{Reasoner} & \textbf{Expressivity} & \textbf{Method} & \textbf{Notes}\\
+\midrule
+RDFox & OWL~2~RL, Datalog, SWRL & parallel materialisation
+  & C++. Highest performance in this class, but commercial and closed source;
+    free academic licences available\\
+VLog & Datalog + existential rules & chase
+  & C++/Java, open source. Rule engine rather than an OWL tool; OWL~RL reached
+    by translating axioms to rules\\
+OWL-RL & OWL~2~RL & forward chaining
+  & Python, on top of RDFLib. Convenient rather than fast\\
+reasonable & OWL~2~RL subset & forward chaining
+  & Rust, with Python bindings. Substantially faster than OWL-RL\\
+Arachne & OWL~RL & Rete
+  & Scala. Built for Gene Ontology causal activity models\\
+Apache Jena & RDFS, partial OWL & forward/backward rules
+  & Java. Deliberately incomplete rule sets; ubiquitous, and often what people
+    mean when they say ``the reasoner in my triple store''\\
+GraphDB & RDFS to OWL~2~RL / QL & forward chaining
+  & Java. Commercial, with a free edition. Rulesets are Horn fragments and
+    deviate from their names in both directions; see
+    Section~\ref{sec:graphdb}\\
+EYE & N3 rules & Euler-path chaining
+  & Prolog/WebAssembly, very actively developed. Not an OWL reasoner as such,
+    but widely used for OWL-adjacent rule reasoning\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection*{Hybrid and pay-as-you-go systems}
+
+A fourth group does not fit the profile tiers: these systems combine reasoners
+rather than implementing a calculus.
+
+\begin{itemize}
+  \item \textbf{PAGOdA} answers conjunctive queries over OWL~2~DL by handling
+    the RL-shaped bulk with a Datalog engine (RDFox) and delegating only the
+    residual hard part to a fully-fledged DL reasoner (HermiT). Complete where
+    the data allows, and fast where it matters.
+  \item \textbf{MORe} and \textbf{Chainsaw} split an ontology into modules and
+    route each to the cheapest adequate reasoner --- typically ELK for the EL
+    part and HermiT for the remainder. Both are now unmaintained.
+  \item \textbf{TrOWL} approximates an OWL~2~DL ontology into QL or EL,
+    trading completeness for tractability in a principled way.
+\end{itemize}
+
+\subsection*{Choosing one}
+
+Expressivity narrows the field; the remaining criteria usually decide it.
+\begin{itemize}
+  \item \textbf{Large terminology, EL-shaped} --- ELK. Nothing else is
+    competitive on SNOMED-scale classification, and the incremental mode
+    changes the editing workflow.
+  \item \textbf{Full OWL~2~DL, performance matters} --- Konclude. If the
+    deployment must be pure Java and OWL~API-native, HermiT, with the
+    maintenance caveat understood.
+  \item \textbf{Data in an RDBMS, ontology used as a query interface} ---
+    Ontop.
+  \item \textbf{Large RDF graphs, forward chaining acceptable} --- RDFox if the
+    licence is acceptable, otherwise a rule engine (VLog, Arachne) or the
+    materialisation built into the triple store.
+  \item \textbf{Embedded or constrained hardware} --- ElepHant (EL) or LiRoT
+    (RL subset); both were built explicitly for that envelope.
+\end{itemize}
+
+\end{document}

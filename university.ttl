@@ -1,0 +1,128 @@
+# =====================================================================
+#  GraphDB reasoning test-bed — small university KG
+#  Each block is tagged with the MINIMUM GraphDB ruleset that should
+#  produce the listed inferences:
+#    [RDFS] < [RDFS-Plus] < [OWL-Horst] < [OWL-Max] ; [OWL2-RL]
+#  Load into repos with different rulesets and compare the results
+#  of queries.rq (Workbench: toggle "Include inferred data").
+# =====================================================================
+@prefix ex:   <http://example.org/uni#> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+
+<http://example.org/uni> a owl:Ontology .
+
+# ---------------------------------------------------------------------
+# TBox
+# ---------------------------------------------------------------------
+
+# [RDFS] class / property hierarchies, domain, range
+ex:Person        a owl:Class .
+ex:Student       a owl:Class ; rdfs:subClassOf ex:Person .
+ex:PhDStudent    a owl:Class ; rdfs:subClassOf ex:Student .
+ex:Academic      a owl:Class ; rdfs:subClassOf ex:Person .
+ex:Professor     a owl:Class ; rdfs:subClassOf ex:Academic .
+ex:Employee      a owl:Class ; rdfs:subClassOf ex:Person .
+ex:TechnicalStaff a owl:Class ; rdfs:subClassOf ex:Employee .
+ex:Researcher    a owl:Class ; rdfs:subClassOf ex:Person .
+ex:Course        a owl:Class .
+ex:OrgUnit       a owl:Class .
+ex:Topic         a owl:Class .
+
+ex:teaches    a owl:ObjectProperty ;
+              rdfs:domain ex:Academic ;
+              rdfs:range  ex:Course .
+ex:teachesLab a owl:ObjectProperty ;
+              rdfs:subPropertyOf ex:teaches .
+
+# [RDFS-Plus] inverse, symmetric, transitive
+ex:supervises       a owl:ObjectProperty ; owl:inverseOf ex:supervisedBy .
+ex:supervisedBy     a owl:ObjectProperty .
+ex:collaboratesWith a owl:ObjectProperty , owl:SymmetricProperty .
+ex:partOf           a owl:ObjectProperty , owl:TransitiveProperty ;
+                    rdfs:domain ex:OrgUnit ; rdfs:range ex:OrgUnit .
+
+# [OWL-Horst] equivalence, (inverse-)functional properties, restrictions
+ex:Docente a owl:Class ; owl:equivalentClass ex:Academic .
+ex:insegna a owl:ObjectProperty ; owl:equivalentProperty ex:teaches .
+
+ex:hasMainSupervisor a owl:ObjectProperty , owl:FunctionalProperty .
+
+# NB: IFP on a datatype property is outside OWL 2 DL, but the
+# rule-based GraphDB rulesets apply it anyway (handy for testing sameAs).
+ex:email a owl:DatatypeProperty , owl:InverseFunctionalProperty .
+
+ex:hasTopic a owl:ObjectProperty .
+ex:SemanticWebCourse a owl:Class ;
+    rdfs:subClassOf ex:Course ;
+    owl:equivalentClass [ a owl:Restriction ;
+                          owl:onProperty ex:hasTopic ;
+                          owl:hasValue   ex:SemanticWeb ] .
+
+ex:Supervisor a owl:Class ;
+    owl:equivalentClass [ a owl:Restriction ;
+                          owl:onProperty    ex:supervises ;
+                          owl:someValuesFrom ex:PhDStudent ] .
+
+ex:hasMember a owl:ObjectProperty .
+ex:ResearchGroup a owl:Class ;
+    rdfs:subClassOf ex:OrgUnit ,
+        [ a owl:Restriction ;
+          owl:onProperty    ex:hasMember ;
+          owl:allValuesFrom ex:Researcher ] .
+
+# [OWL2-RL] intersection, union, property chains, keys, disjointness
+ex:WorkingStudent a owl:Class ;
+    owl:equivalentClass [ a owl:Class ;
+                          owl:intersectionOf ( ex:Student ex:Employee ) ] .
+
+ex:Staff a owl:Class ;
+    owl:equivalentClass [ a owl:Class ;
+                          owl:unionOf ( ex:Academic ex:TechnicalStaff ) ] .
+
+ex:affiliatedWith a owl:ObjectProperty ;
+    owl:propertyChainAxiom ( ex:affiliatedWith ex:partOf ) .
+
+ex:orcid a owl:DatatypeProperty .
+ex:Person owl:hasKey ( ex:orcid ) .
+
+ex:Person owl:disjointWith ex:Course .   # exercised in inconsistent.ttl
+
+# ---------------------------------------------------------------------
+# ABox
+# ---------------------------------------------------------------------
+
+# alice has NO explicit type: everything about her is inferred
+ex:alice ex:teaches    ex:kg101 ;
+         ex:teachesLab ex:kgLab ;
+         ex:supervises ex:carla ;
+         ex:collaboratesWith ex:bruno ;
+         ex:affiliatedWith   ex:kgGroup ;
+         ex:email "alice@example.org" .
+
+ex:bruno ex:insegna ex:db201 .
+
+ex:carla a ex:PhDStudent ;
+         ex:hasMainSupervisor ex:alice , ex:profAlice .
+
+ex:a_rossi ex:email "alice@example.org" ;
+           ex:homepage <http://example.org/~arossi> .
+
+ex:dario  a ex:Person ; ex:orcid "0000-0002-1111-2222" .
+ex:d_verdi a ex:Person ; ex:orcid "0000-0002-1111-2222" ;
+           ex:hIndex 13 .
+
+ex:kg101 ex:hasTopic ex:SemanticWeb .
+ex:sw301 a ex:SemanticWebCourse .
+
+ex:kgGroup a ex:ResearchGroup ;
+           ex:hasMember ex:elena ;
+           ex:partOf ex:dept .
+ex:dept    ex:partOf ex:faculty .
+ex:faculty ex:partOf ex:unibo .
+
+ex:franco a ex:Student , ex:Employee .
+ex:giulia a ex:WorkingStudent .
+ex:hugo   a ex:TechnicalStaff .

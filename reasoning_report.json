@@ -1,0 +1,900 @@
+{
+  "Q1": {
+    "reasoning-test-horst": {
+      "vars": [
+        "t"
+      ],
+      "rows": [
+        [
+          "_:b"
+        ],
+        [
+          "ex:Academic"
+        ],
+        [
+          "ex:Docente"
+        ],
+        [
+          "ex:Person"
+        ],
+        [
+          "ex:Supervisor"
+        ]
+      ]
+    },
+    "reasoning-test-owl-max": {
+      "vars": [
+        "t"
+      ],
+      "rows": [
+        [
+          "_:b"
+        ],
+        [
+          "ex:Academic"
+        ],
+        [
+          "ex:Docente"
+        ],
+        [
+          "ex:Person"
+        ],
+        [
+          "ex:Staff"
+        ],
+        [
+          "ex:Supervisor"
+        ]
+      ]
+    },
+    "reasoning-test-owl2-ql-opt": {
+      "vars": [
+        "t"
+      ],
+      "rows": [
+        [
+          "ex:Academic"
+        ],
+        [
+          "ex:Docente"
+        ],
+        [
+          "ex:Person"
+        ],
+        [
+          "owl:Thing"
+        ]
+      ]
+    },
+    "reasoning-test-rdfs-plus-opt": {
+      "vars": [
+        "t"
+      ],
+      "rows": []
+    }
+  },
+  "Q2": {
+    "reasoning-test-horst": {
+      "vars": [
+        "who",
+        "c"
+      ],
+      "rows": [
+        [
+          "ex:a_rossi",
+          "ex:kg101"
+        ],
+        [
+          "ex:a_rossi",
+          "ex:kgLab"
+        ],
+        [
+          "ex:alice",
+          "ex:kg101"
+        ],
+        [
+          "ex:alice",
+          "ex:kgLab"
+        ],
+        [
+          "ex:bruno",
+          "ex:db201"
+        ],
+        [
+          "ex:profAlice",
+          "ex:kg101"
+        ],
+        [
+          "ex:profAlice",
+          "ex:kgLab"
+        ]
+      ]
+    },
+    "reasoning-test-owl-max": {
+      "vars": [
+        "who",
+        "c"
+      ],
+      "rows": [
+        [
+          "ex:a_rossi",
+          "ex:kg101"
+        ],
+        [
+          "ex:a_rossi",
+          "ex:kgLab"
+        ],
+        [
+          "ex:alice",
+          "ex:kg101"
+        ],
+        [
+          "ex:alice",
+          "ex:kgLab"
+        ],
+        [
+          "ex:bruno",
+          "ex:db201"
+        ],
+        [
+          "ex:profAlice",
+          "ex:kg101"
+        ],
+        [
+          "ex:profAlice",
+          "ex:kgLab"
+        ]
+      ]
+    },
+    "reasoning-test-owl2-ql-opt": {
+      "vars": [
+        "who",
+        "c"
+      ],
+      "rows": [
+        [
+          "ex:alice",
+          "ex:kg101"
+        ],
+        [
+          "ex:alice",
+          "ex:kgLab"
+        ],
+        [
+          "ex:bruno",
+          "ex:db201"
+        ]
+      ]
+    },
+    "reasoning-test-rdfs-plus-opt": {
+      "vars": [
+        "who",
+        "c"
+      ],
+      "rows": []
+    }
+  },
+  "Q3": {
+    "reasoning-test-horst": {
+      "vars": [
+        "s",
+        "c",
+        "u"
+      ],
+      "rows": [
+        [
+          "",
+          "",
+          "ex:dept"
+        ],
+        [
+          "",
+          "",
+          "ex:faculty"
+        ],
+        [
+          "",
+          "",
+          "ex:unibo"
+        ],
+        [
+          "",
+          "ex:a_rossi",
+          ""
+        ],
+        [
+          "",
+          "ex:alice",
+          ""
+        ],
+        [
+          "",
+          "ex:profAlice",
+          ""
+        ],
+        [
+          "ex:a_rossi",
+          "",
+          ""
+        ],
+        [
+          "ex:alice",
+          "",
+          ""
+        ],
+        [
+          "ex:profAlice",
+          "",
+          ""
+        ]
+      ]
+    },
+    "reasoning-test-owl-max": {
+      "vars": [
+        "s",
+        "c",
+        "u"
+      ],
+      "rows": [
+        [
+          "",
+          "",
+          "ex:dept"
+        ],
+        [
+          "",
+          "",
+          "ex:faculty"
+        ],
+        [
+          "",
+          "",
+          "ex:unibo"
+        ],
+        [
+          "",
+          "ex:a_rossi",
+          ""
+        ],
+        [
+          "",
+          "ex:alice",
+          ""
+        ],
+        [
+          "",
+          "ex:profAlice",
+          ""
+        ],
+        [
+          "ex:a_rossi",
+          "",
+          ""
+        ],
+        [
+          "ex:alice",
+          "",
+          ""
+        ],
+        [
+          "ex:profAlice",
+          "",
+          ""
+        ]
+      ]
+    },
+    "reasoning-test-owl2-ql-opt": {
+      "vars": [
+        "s",
+        "c",
+        "u"
+      ],
+      "rows": [
+        [
+          "",
+          "",
+          "ex:dept"
+        ],
+        [
+          "",
+          "ex:alice",
+          ""
+        ],
+        [
+          "ex:alice",
+          "",
+          ""
+        ]
+      ]
+    },
+    "reasoning-test-rdfs-plus-opt": {
+      "vars": [
+        "s",
+        "c",
+        "u"
+      ],
+      "rows": [
+        [
+          "",
+          "",
+          "ex:dept"
+        ],
+        [
+          "",
+          "",
+          "ex:faculty"
+        ],
+        [
+          "",
+          "",
+          "ex:unibo"
+        ],
+        [
+          "",
+          "ex:alice",
+          ""
+        ],
+        [
+          "ex:alice",
+          "",
+          ""
+        ]
+      ]
+    }
+  },
+  "Q4": {
+    "reasoning-test-horst": {
+      "vars": [
+        "d"
+      ],
+      "rows": [
+        [
+          "ex:a_rossi"
+        ],
+        [
+          "ex:alice"
+        ],
+        [
+          "ex:bruno"
+        ],
+        [
+          "ex:profAlice"
+        ]
+      ]
+    },
+    "reasoning-test-owl-max": {
+      "vars": [
+        "d"
+      ],
+      "rows": [
+        [
+          "ex:a_rossi"
+        ],
+        [
+          "ex:alice"
+        ],
+        [
+          "ex:bruno"
+        ],
+        [
+          "ex:profAlice"
+        ]
+      ]
+    },
+    "reasoning-test-owl2-ql-opt": {
+      "vars": [
+        "d"
+      ],
+      "rows": [
+        [
+          "ex:alice"
+        ],
+        [
+          "ex:bruno"
+        ]
+      ]
+    },
+    "reasoning-test-rdfs-plus-opt": {
+      "vars": [
+        "d"
+      ],
+      "rows": []
+    }
+  },
+  "Q5": {
+    "reasoning-test-horst": {
+      "vars": [
+        "same",
+        "hp"
+      ],
+      "rows": [
+        [
+          "ex:a_rossi",
+          "<http://example.org/~arossi>"
+        ],
+        [
+          "ex:alice",
+          "<http://example.org/~arossi>"
+        ],
+        [
+          "ex:profAlice",
+          "<http://example.org/~arossi>"
+        ]
+      ]
+    },
+    "reasoning-test-owl-max": {
+      "vars": [
+        "same",
+        "hp"
+      ],
+      "rows": [
+        [
+          "ex:a_rossi",
+          "<http://example.org/~arossi>"
+        ],
+        [
+          "ex:alice",
+          "<http://example.org/~arossi>"
+        ],
+        [
+          "ex:profAlice",
+          "<http://example.org/~arossi>"
+        ]
+      ]
+    },
+    "reasoning-test-owl2-ql-opt": {
+      "vars": [
+        "same",
+        "hp"
+      ],
+      "rows": []
+    },
+    "reasoning-test-rdfs-plus-opt": {
+      "vars": [
+        "same",
+        "hp"
+      ],
+      "rows": []
+    }
+  },
+  "Q6": {
+    "reasoning-test-horst": {
+      "vars": [
+        "c1",
+        "topic",
+        "s",
+        "r"
+      ],
+      "rows": [
+        [
+          "",
+          "",
+          "",
+          "ex:elena"
+        ],
+        [
+          "",
+          "",
+          "ex:a_rossi",
+          ""
+        ],
+        [
+          "",
+          "",
+          "ex:alice",
+          ""
+        ],
+        [
+          "",
+          "",
+          "ex:profAlice",
+          ""
+        ],
+        [
+          "",
+          "ex:SemanticWeb",
+          "",
+          ""
+        ],
+        [
+          "ex:kg101",
+          "",
+          "",
+          ""
+        ],
+        [
+          "ex:sw301",
+          "",
+          "",
+          ""
+        ]
+      ]
+    },
+    "reasoning-test-owl-max": {
+      "vars": [
+        "c1",
+        "topic",
+        "s",
+        "r"
+      ],
+      "rows": [
+        [
+          "",
+          "",
+          "",
+          "ex:elena"
+        ],
+        [
+          "",
+          "",
+          "ex:a_rossi",
+          ""
+        ],
+        [
+          "",
+          "",
+          "ex:alice",
+          ""
+        ],
+        [
+          "",
+          "",
+          "ex:profAlice",
+          ""
+        ],
+        [
+          "",
+          "ex:SemanticWeb",
+          "",
+          ""
+        ],
+        [
+          "ex:kg101",
+          "",
+          "",
+          ""
+        ],
+        [
+          "ex:sw301",
+          "",
+          "",
+          ""
+        ]
+      ]
+    },
+    "reasoning-test-owl2-ql-opt": {
+      "vars": [
+        "c1",
+        "topic",
+        "s",
+        "r"
+      ],
+      "rows": [
+        [
+          "ex:sw301",
+          "",
+          "",
+          ""
+        ]
+      ]
+    },
+    "reasoning-test-rdfs-plus-opt": {
+      "vars": [
+        "c1",
+        "topic",
+        "s",
+        "r"
+      ],
+      "rows": [
+        [
+          "ex:sw301",
+          "",
+          "",
+          ""
+        ]
+      ]
+    }
+  },
+  "Q7": {
+    "reasoning-test-horst": {
+      "vars": [
+        "ws",
+        "gt",
+        "st"
+      ],
+      "rows": [
+        [
+          "",
+          "_:b",
+          ""
+        ],
+        [
+          "",
+          "ex:Employee",
+          ""
+        ],
+        [
+          "",
+          "ex:Person",
+          ""
+        ],
+        [
+          "",
+          "ex:Student",
+          ""
+        ],
+        [
+          "",
+          "ex:WorkingStudent",
+          ""
+        ],
+        [
+          "ex:franco",
+          "",
+          ""
+        ],
+        [
+          "ex:giulia",
+          "",
+          ""
+        ]
+      ]
+    },
+    "reasoning-test-owl-max": {
+      "vars": [
+        "ws",
+        "gt",
+        "st"
+      ],
+      "rows": [
+        [
+          "",
+          "",
+          "ex:a_rossi"
+        ],
+        [
+          "",
+          "",
+          "ex:alice"
+        ],
+        [
+          "",
+          "",
+          "ex:bruno"
+        ],
+        [
+          "",
+          "",
+          "ex:hugo"
+        ],
+        [
+          "",
+          "",
+          "ex:profAlice"
+        ],
+        [
+          "",
+          "_:b",
+          ""
+        ],
+        [
+          "",
+          "ex:Employee",
+          ""
+        ],
+        [
+          "",
+          "ex:Person",
+          ""
+        ],
+        [
+          "",
+          "ex:Student",
+          ""
+        ],
+        [
+          "",
+          "ex:WorkingStudent",
+          ""
+        ],
+        [
+          "ex:franco",
+          "",
+          ""
+        ],
+        [
+          "ex:giulia",
+          "",
+          ""
+        ]
+      ]
+    },
+    "reasoning-test-owl2-ql-opt": {
+      "vars": [
+        "ws",
+        "gt",
+        "st"
+      ],
+      "rows": [
+        [
+          "",
+          "_:b",
+          ""
+        ],
+        [
+          "",
+          "ex:Employee",
+          ""
+        ],
+        [
+          "",
+          "ex:Person",
+          ""
+        ],
+        [
+          "",
+          "ex:Student",
+          ""
+        ],
+        [
+          "",
+          "ex:WorkingStudent",
+          ""
+        ],
+        [
+          "",
+          "owl:Thing",
+          ""
+        ],
+        [
+          "ex:franco",
+          "",
+          ""
+        ],
+        [
+          "ex:giulia",
+          "",
+          ""
+        ]
+      ]
+    },
+    "reasoning-test-rdfs-plus-opt": {
+      "vars": [
+        "ws",
+        "gt",
+        "st"
+      ],
+      "rows": [
+        [
+          "",
+          "_:b",
+          ""
+        ],
+        [
+          "",
+          "ex:WorkingStudent",
+          ""
+        ],
+        [
+          "ex:giulia",
+          "",
+          ""
+        ]
+      ]
+    }
+  },
+  "Q8": {
+    "reasoning-test-horst": {
+      "vars": [
+        "org"
+      ],
+      "rows": [
+        [
+          "ex:kgGroup"
+        ]
+      ]
+    },
+    "reasoning-test-owl-max": {
+      "vars": [
+        "org"
+      ],
+      "rows": [
+        [
+          "ex:kgGroup"
+        ]
+      ]
+    },
+    "reasoning-test-owl2-ql-opt": {
+      "vars": [
+        "org"
+      ],
+      "rows": [
+        [
+          "ex:kgGroup"
+        ]
+      ]
+    },
+    "reasoning-test-rdfs-plus-opt": {
+      "vars": [
+        "org"
+      ],
+      "rows": [
+        [
+          "ex:kgGroup"
+        ]
+      ]
+    }
+  },
+  "Q9": {
+    "reasoning-test-horst": {
+      "vars": [
+        "x",
+        "h"
+      ],
+      "rows": []
+    },
+    "reasoning-test-owl-max": {
+      "vars": [
+        "x",
+        "h"
+      ],
+      "rows": []
+    },
+    "reasoning-test-owl2-ql-opt": {
+      "vars": [
+        "x",
+        "h"
+      ],
+      "rows": []
+    },
+    "reasoning-test-rdfs-plus-opt": {
+      "vars": [
+        "x",
+        "h"
+      ],
+      "rows": []
+    }
+  },
+  "Q10": {
+    "reasoning-test-horst": {
+      "vars": [
+        "n"
+      ],
+      "rows": [
+        [
+          "\"337\""
+        ]
+      ]
+    },
+    "reasoning-test-owl-max": {
+      "vars": [
+        "n"
+      ],
+      "rows": [
+        [
+          "\"361\""
+        ]
+      ]
+    },
+    "reasoning-test-owl2-ql-opt": {
+      "vars": [
+        "n"
+      ],
+      "rows": [
+        [
+          "\"1596\""
+        ]
+      ]
+    },
+    "reasoning-test-rdfs-plus-opt": {
+      "vars": [
+        "n"
+      ],
+      "rows": [
+        [
+          "\"193\""
+        ]
+      ]
+    }
+  }
+}

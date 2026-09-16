@@ -1,0 +1,16 @@
+# Load ONLY into a repo with "Enable consistency checks" = true
+# (OWL2-RL / OWL-Max rulesets). Each triple set should make the
+# commit fail with a consistency violation. Test them one at a time.
+@prefix ex:  <http://example.org/uni#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+
+# 1) disjointness: ex:Person owl:disjointWith ex:Course
+ex:zeno a ex:Person , ex:Course .
+
+# 2) functional property + differentFrom
+# ex:mario ex:hasMainSupervisor ex:p1 , ex:p2 .
+# ex:p1 owl:differentFrom ex:p2 .
+
+# 3) disjointness reached only via inference (range of ex:teaches)
+# ex:ugo a ex:Student .
+# ex:alice ex:teaches ex:ugo .
