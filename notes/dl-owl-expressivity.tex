@@ -97,7 +97,8 @@ an example axiom in DL syntax, and the corresponding OWL~2 encoding in Turtle.
 It closes with the mapping between named DLs and OWL species, with a
 comparison of the three OWL~2 profiles, with an analysis of the rule-based
 entailment regimes offered by GraphDB --- including an empirical check of what
-each ruleset actually infers --- and with a survey of openly available
+each ruleset actually infers ---, with a case study assessing the ECMO~0.3.0
+ontology against those regimes, and with a survey of openly available
 reasoners.
 \end{abstract}
 
@@ -860,6 +861,164 @@ Four observations deviate from expectations.
   \item \textbf{Materialisation cost varies sharply between rulesets}, and is
     not monotone in apparent expressivity, as the QL figure shows.
 \end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Case study: ECMO 0.3.0 against the GraphDB rulesets}
+\label{sec:ecmo}
+
+This section applies the analysis of Section~\ref{sec:graphdb} to a real
+ontology network: ECMO~0.3.0, the JRC ontology for emergency and crisis
+management, built on the Sendai Framework terminology and aligned to
+DOLCE+DnS Ultralite (DUL) through d0. The assessment is based on the backbone
+modules (hub, core, core pattern, foundation, disaster, risk); the remaining
+domain modules and the file of inferred axioms were not inspected, so the
+picture is indicative rather than a complete profile.
+
+\subsection*{Constructs used and ruleset support}
+
+\begin{table}[h]
+\centering
+\footnotesize
+\newcommand{\tyes}{$\checkmark$}
+\newcommand{\tno}{$\times$}
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}p{3.2cm}p{4.9cm}cccccc@{}}
+\toprule
+\textbf{Construct} & \textbf{Example in ECMO} & \textbf{RDFS} & \textbf{RDFS+} &
+  \textbf{Horst} & \textbf{Max} & \textbf{QL} & \textbf{RL}\\
+\midrule
+Subclass, subproperty, domain, range & throughout
+  & \tyes & \tyes & \tyes & \tyes & \tyes & \tyes\\
+Inverse properties & dozens of named pairs, e.g.\ \texttt{hasHazardDeterminant}
+  & & \tyes & \tyes & \tyes & \tyes & \tyes\\
+Transitive properties & \texttt{subsumedUnder}, \texttt{specializes},
+  \texttt{includesEvent}
+  & & \tyes & \tyes & \tyes & \tno & \tyes\\
+Symmetric property & \texttt{isComplementaryTo}
+  & & \tyes & \tyes & \tyes & \tyes & \tyes\\
+\texttt{hasValue}, superclass side
+  & $\cn{DirectlyAffectedPopulation} \sub \exists\rn{hasAffectednessType}.\{\ind{Direct}\}$
+  & & & \tyes & \tyes & \tno & \tyes\\
+\texttt{owl:sameAs} & the HIPS hazard individuals
+  & & & \tyes & \tyes & \tno & \tyes\\
+Defined class (intersection, nested $\exists$, \texttt{hasValue})
+  & $\cn{Disaster}$, see below
+  & & & partial & partial & \tno & \tyes$^{a}$\\
+Union, subclass side & $\cn{Eventuality} \eqv \cn{Event} \sqcup \cn{EventType} \sqcup \cn{Situation}$
+  & & & \tno & \tyes & \tno & \tyes\\
+Union, superclass side & $\cn{Assessment} \sub \cn{Eventuality} \sqcup \cn{InformationEntity}$
+  & \tno & \tno & \tno & \tno & \tno & \tno\\
+$\exists$, superclass side & $\cn{Risk} \sub$ $\exists\rn{hasHazardDeterminant}.\cn{Hazard}$
+  & \multicolumn{6}{c}{no witness generated}\\
+Qualified cardinality & $\cn{Assessment} \sub {\geq}1\,\rn{assesses}.\cn{Entity}$
+  & \tno & \tno & \tno & \tno & \tno & \tno\\
+Property chains & $\rn{isSettingFor} \circ \rn{isAbout} \sub \rn{assesses}$
+  & & & & & \tno & \tyes\\
+Disjointness & \texttt{Frequent}/\texttt{InfrequentDisaster};
+  DUL: $\cn{Description} \sqcap \cn{Situation}$ $\sqsubseteq \bot$
+  & \multicolumn{6}{c}{checks only (Max, RL)}\\
+Punning & hazard, risk and disaster subtypes
+  & \multicolumn{6}{c}{transparent to rules}\\
+\bottomrule
+\end{tabular}
+
+\smallskip
+\raggedright
+$^{a}$~in the classifying direction ($\sqsupseteq$) only.
+\end{table}
+
+\noindent
+The defined class that carries most of the semantic weight is
+\[
+  \cn{Disaster} \eqv \cn{HazardousEvent} \sqcap
+  \exists \rn{hasImpact}.(\cn{Impact} \sqcap
+  \exists \rn{hasImpactIntensity}.\{\ind{VeryHighImpactIntensity}\}).
+\]
+Only its right-to-left half is rule-expressible, and only OWL~2~RL guarantees
+it; it is what lets a materialising store classify a hazardous event as a
+disaster from its reported impacts.
+
+\subsection*{DL expressivity}
+
+The constructs above --- nominals through \texttt{hasValue}, inverse and
+transitive roles, role chains, qualified cardinality, union in superclass
+position, datatypes --- place ECMO in $\SROIQ^{(\mathcal{D})}$, i.e.\ OWL~2~DL,
+and outside all three OWL~2 profiles.
+
+Strictly, one axiom takes it out of OWL~2~DL. \texttt{foundation:assesses} is
+defined by a property chain and is therefore a \emph{non-simple} role, and
+OWL~2~DL forbids cardinality restrictions on non-simple roles:
+\begin{lstlisting}
+foundation:Assessment rdfs:subClassOf [ a owl:Restriction ;
+    owl:minQualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+    owl:onClass dul:Entity ; owl:onProperty foundation:assesses ] .
+\end{lstlisting}
+Since ${\geq}1\,R.C \equiv \exists R.C$ and existentials are permitted on
+non-simple roles, replacing the restriction with
+\texttt{owl:someValuesFrom dul:Entity} preserves the meaning and restores
+OWL~2~DL conformance.
+
+\subsection*{What each ruleset delivers for ECMO}
+
+\begin{itemize}
+  \item \textbf{RDFS-Plus is the minimum useful regime.} ECMO's own design
+    rests on the Description-and-Situation subsumption hierarchy expressed
+    through the transitive \texttt{subsumedUnder}/\texttt{specializes}, on
+    systematically named inverses, and on domain/range typing. In view of the
+    anomaly reported in Section~\ref{sec:graphdb}, domain and range inference
+    must be verified on whichever ruleset is deployed.
+  \item \textbf{OWL-Horst} adds the \texttt{hasValue} classifications of the
+    affected-population and risk-profile subclasses, and merges the HIPS
+    hazard individuals through \texttt{owl:sameAs}.
+  \item \textbf{OWL-Max} adds the union, making every event and situation a
+    \texttt{d0:Eventuality} --- largely redundant with the domain axioms on
+    that class.
+  \item \textbf{OWL~2~RL} is the only ruleset that fires the property chains
+    linking \texttt{assesses} to DUL's setting and aboutness relations, that
+    reliably classifies events as \texttt{Disaster}, and that checks the
+    disjointness axioms ECMO relies on as coherence guards.
+  \item \textbf{OWL~2~QL} is unsuitable: without transitivity the whole
+    \texttt{subsumedUnder} hierarchy is lost, together with chains and
+    \texttt{hasValue}.
+  \item \textbf{No ruleset} exploits the union in superclass position, the
+    superclass-side existentials (the four determinants of \texttt{Risk},
+    \texttt{Signal}, \texttt{EventValidation}), or the cardinality axiom.
+    Their consequences require a DL reasoner.
+\end{itemize}
+
+\subsection*{Deployment notes}
+
+\begin{itemize}
+  \item \textbf{Imports are not followed.} GraphDB does not resolve
+    \texttt{owl:imports}; all modules, and DUL/d0, must be loaded explicitly.
+    Without DUL the property chains have nothing to fire on and the DUL
+    disjointness guards are absent.
+  \item \textbf{The import closure is incomplete as distributed.} The catalog
+    maps the eight alignment modules to a \texttt{0.3.0-alignments/}
+    directory that is not present, and the \texttt{frames} module imported by
+    \texttt{ecmo-core} has no catalog entry (presumably
+    \texttt{ecmo-frame-model.ttl}).
+  \item \textbf{Recommended set-up:} OWL~2~RL in the store, complemented by an
+    offline DL reasoner (Konclude or HermiT) for the non-Horn consequences.
+    The distributed \texttt{ecmo-inferredaxioms.ttl} appears to be the output
+    of such a run; if so, loading it alongside the modules closes most of the
+    remaining gap (not verified).
+  \item \textbf{A modelling point to review.} \texttt{risk:Risk} is asserted
+    as a subclass of \texttt{hazard:Hazard}, so every rule-based regime types
+    every risk as a hazard --- at odds with ECMO's own reading of risk as a
+    function of hazard, exposure, vulnerability and capacity.
+\end{itemize}
+
+\noindent
+A complete, rather than sampled, profile can be obtained with ROBOT once the
+catalog is fixed; the RL report lists exactly the axioms a GraphDB OWL~2~RL
+repository cannot fully exploit, the DL report should flag the cardinality
+violation above.
+\begin{lstlisting}[language={}]
+robot merge --catalog catalog-v001.xml --input ecmo-core.ttl --output merged.owl
+robot validate-profile --profile RL --input merged.owl --output rl-violations.txt
+robot validate-profile --profile DL --input merged.owl --output dl-violations.txt
+\end{lstlisting}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Openly available reasoners}
