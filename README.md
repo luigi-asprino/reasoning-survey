@@ -13,6 +13,8 @@ relating those regimes to Description Logic families and OWL 2 profiles.
 | `queries.rq` | Queries Q1–Q10, one construct family each, with expected results in the comments. |
 | `run_reasoning_tests.py` | Runs `queries.rq` against several repositories and writes a side-by-side comparison. |
 | `reasoning_report.md` / `.json` | Output of the last run. |
+| `benchmark_rulesets.py` | Measures how each ruleset affects loading time and materialisation size. |
+| `ecmo-graphdb-benchmark.sh` | Runs the loading-time benchmark on the ECMO ontology. |
 | `notes/dl-owl-expressivity.tex` | Notes on DL naming, OWL 2 profiles, GraphDB rulesets as Horn fragments, empirical results, and available reasoners. |
 
 ## Setup
@@ -50,6 +52,63 @@ The script prints each repository's ruleset and `disableSameAs` setting,
 normalises blank-node labels and IRIs so results are comparable, and lists what
 each repository is missing relative to the union of all results (skipped for
 aggregate queries).
+
+## Loading-time benchmark
+
+`benchmark_rulesets.py` measures what each entailment regime costs at load
+time. GraphDB materialises inferences on commit, so the time a load takes
+includes the whole forward-chaining step. The script repeats the following for
+every ruleset:
+
+1. Create a fresh repository `bench-ruleset-<ruleset>`.
+2. Load the ontology files, if any, timing them separately.
+3. Load the data files.
+4. Record explicit, inferred and total statement counts.
+5. Delete the repository.
+
+The `reasoning-test-*` repositories are never touched. Standard library only.
+
+The `rdfsplus` rulesets are excluded because they don't apply `rdfs:domain`
+and `rdfs:range` (see below).
+
+```bash
+python benchmark_rulesets.py                       # university.ttl, 11 built-in rulesets (all but rdfsplus*), 1 warm-up + 3 runs
+python benchmark_rulesets.py --ontology onto.ttl --data data1.ttl data2.nt.gz -n 5
+python benchmark_rulesets.py --rulesets empty rdfs-optimized owl-horst-optimized owl2-rl-optimized --keep
+python benchmark_rulesets.py --disable-sameas      # GraphDB's own default; affects horst/max/rl
+python benchmark_rulesets.py --check-inconsistencies
+```
+
+Each run is written to a CSV (`benchmark_rulesets_<timestamp>.csv`, or set it
+with `-o`). The script then prints the median load time, standard deviation,
+slowdown compared with `empty`, and the ratio of inferred to explicit
+statements for each ruleset. owl:sameAs handling is enabled by default, as in
+the test repositories.
+
+`university.ttl` loads in milliseconds, so use a larger dataset to get
+meaningful timings. Gzipped files are decompressed on the fly. A `.owl`/`.rdf`/`.xml` file that
+fails to parse as RDF/XML is retried as Turtle (DUL.owl is Turtle); the failed
+attempt is excluded from the timing. The repository
+config uses the GraphDB 10.x vocabulary.
+
+### ECMO
+
+`ecmo-graphdb-benchmark.sh` runs the benchmark on the ECMO release in
+`../ecmo-0.3.1-dl42-patched`. It loads every ECMO module and the alignments
+as the ontology, and the unit-test case fixtures as data (`--no-data` to skip).
+DUL and d0 are not loaded unless you pass `--dul`: GraphDB doesn't follow
+`owl:imports`, so the script then downloads them once into `ecmo-deps/`.
+
+```bash
+./ecmo-graphdb-benchmark.sh                          # sameAs on and off, with data, 10 runs
+./ecmo-graphdb-benchmark.sh --sameas off --no-data   # one mode, ontology only
+./ecmo-graphdb-benchmark.sh --dul                    # also load DUL and d0
+./ecmo-graphdb-benchmark.sh -n 1 --rulesets empty rdfs-optimized owl2-ql-optimized owl-horst-optimized owl-max-optimized owl2-rl-optimized 
+```
+
+ECMO contains about 3.7k `owl:sameAs` links, mostly in `ecmo-ph.ttl`, so it is
+worth comparing both sameAs modes. Results go to
+`ecmo_benchmark_sameas-<on|off>_<data|nodata>[_dul]_<timestamp>.csv`.
 
 ## Findings so far
 

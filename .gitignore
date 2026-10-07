@@ -330,3 +330,10 @@ TSWLatexianTemp*
 # option is specified. Footnotes are the stored in a file with suffix Notes.bib.
 # Uncomment the next line to have this generated file ignored.
 #*Notes.bib
+# ruleset benchmark output
+benchmark_rulesets_*.csv
+
+# ECMO benchmark: downloaded imports and results
+ecmo-deps/
+ecmo_benchmark_*.csv
+__pycache__/

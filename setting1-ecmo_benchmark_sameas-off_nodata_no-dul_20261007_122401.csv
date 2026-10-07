@@ -1,0 +1,13 @@
+ruleset,run,warmup,onto_load_s,data_load_s,total_load_s,explicit,inferred,total,inferred_ratio,error
+empty,1,True,1.39,0.0,1.39,39253,0,39253,0.0,
+empty,2,False,1.32,0.0,1.32,39253,0,39253,0.0,
+rdfs-optimized,1,True,2.067,0.0,2.067,39253,38918,78171,0.991,
+rdfs-optimized,2,False,1.856,0.0,1.856,39253,38918,78171,0.991,
+owl2-ql-optimized,1,True,10.291,0.0,10.291,39253,73935,113188,1.884,
+owl2-ql-optimized,2,False,11.285,0.0,11.285,39253,73935,113188,1.884,
+owl-horst-optimized,1,True,9.118,0.0,9.118,39253,66568,105821,1.696,
+owl-horst-optimized,2,False,8.953,0.0,8.953,39253,66568,105821,1.696,
+owl-max-optimized,1,True,24.761,0.0,24.761,39253,84959,124212,2.164,
+owl-max-optimized,2,False,27.347,0.0,27.347,39253,84959,124212,2.164,
+owl2-rl-optimized,1,True,21.76,0.0,21.76,39253,116631,155884,2.971,
+owl2-rl-optimized,2,False,22.687,0.0,22.687,39253,116631,155884,2.971,
