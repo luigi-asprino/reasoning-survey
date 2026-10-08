@@ -10,6 +10,13 @@
 #   --sameas on|off|both   owl:sameAs handling in the benchmark repos (default: both)
 #   --data | --no-data     also load the case fixtures as data (default: --data)
 #   --dul | --no-dul       also load DUL and d0 as ontology (default: --no-dul)
+#   --dul-lite             like --dul, but dul:associatedWith is neither transitive
+#                          nor symmetric (dul-variants/DUL-lite.ttl)
+#   --dul-flat             like --dul, but no DUL property is transitive or
+#                          symmetric (dul-variants/DUL-flat.ttl)
+#   --dul-file FILE        like --dul, but load FILE instead of DUL
+#   --consistency          enable GraphDB consistency checks; an inconsistent load
+#                          is reported as INCONSISTENT with the violated rule
 #   --ecmo DIR             ECMO release folder (default: ../ecmo-0.3.1-dl42-patched)
 #   -n N                   measured repetitions per ruleset (default: 10)
 #   --rulesets R1 R2 ...   rulesets to test (default: all but rdfsplus*)
@@ -19,28 +26,37 @@
 #   ./ecmo-graphdb-benchmark.sh
 #   ./ecmo-graphdb-benchmark.sh --sameas off --no-data
 #   ./ecmo-graphdb-benchmark.sh --dul
+#   ./ecmo-graphdb-benchmark.sh --dul-lite --rulesets owl-horst-optimized owl2-rl-optimized
+#   ./ecmo-graphdb-benchmark.sh --consistency --sameas on -n 1 --rulesets owl2-rl-optimized
 #   ./ecmo-graphdb-benchmark.sh -n 5 --rulesets empty rdfs-optimized owl2-rl-optimized
 #   ./ecmo-graphdb-benchmark.sh -- --url http://other-host:7200 --warmup 0
 set -euo pipefail
 
 HERE="$(cd "$(dirname "$0")" && pwd)"
-ECMO="$HERE/../ecmo-0.3.1-dl42-patched"
+ECMO="$HERE/../ecmo/0.3.1_audited"
 SAMEAS="both"
 WITH_DATA=1
 WITH_DUL=0
+DUL_FILE=""      # empty = original DUL (downloaded)
+DUL_TAG="dul"
+CONSISTENCY=0
 REPS=10
 RULESETS=()
 EXTRA=()
 
-usage() { sed -n '2,23p' "$0" | sed 's/^# \{0,1\}//'; exit "${1:-0}"; }
+usage() { sed -n '2,32p' "$0" | sed 's/^# \{0,1\}//'; exit "${1:-0}"; }
 
 while [ $# -gt 0 ]; do
   case "$1" in
     --sameas)  SAMEAS="${2:-}"; shift 2 ;;
     --data)    WITH_DATA=1; shift ;;
     --no-data) WITH_DATA=0; shift ;;
-    --dul)     WITH_DUL=1; shift ;;
-    --no-dul)  WITH_DUL=0; shift ;;
+    --dul)      WITH_DUL=1; DUL_FILE=""; DUL_TAG="dul"; shift ;;
+    --no-dul)   WITH_DUL=0; shift ;;
+    --dul-lite) WITH_DUL=1; DUL_FILE="$HERE/dul-variants/DUL-lite.ttl"; DUL_TAG="dul-lite"; shift ;;
+    --dul-flat) WITH_DUL=1; DUL_FILE="$HERE/dul-variants/DUL-flat.ttl"; DUL_TAG="dul-flat"; shift ;;
+    --dul-file) WITH_DUL=1; DUL_FILE="${2:-}"; DUL_TAG="dul-$(basename "${2:-custom}" | sed 's/\.[^.]*$//')"; shift 2 ;;
+    --consistency) CONSISTENCY=1; shift ;;
     --ecmo)    ECMO="${2:-}"; shift 2 ;;
     -n)        REPS="${2:-}"; shift 2 ;;
     --rulesets)
@@ -74,9 +90,13 @@ fetch() {  # url file
 shopt -s nullglob
 ONTO=()
 if [ "$WITH_DUL" -eq 1 ]; then
-  fetch http://www.ontologydesignpatterns.org/ont/dul/DUL.owl DUL.owl
-  fetch http://www.ontologydesignpatterns.org/ont/d0.owl      d0.owl
-  ONTO+=("$DEPS/DUL.owl" "$DEPS/d0.owl")
+  fetch http://www.ontologydesignpatterns.org/ont/d0.owl d0.owl
+  if [ -z "$DUL_FILE" ]; then
+    fetch http://www.ontologydesignpatterns.org/ont/dul/DUL.owl DUL.owl
+    DUL_FILE="$DEPS/DUL.owl"
+  fi
+  [ -f "$DUL_FILE" ] || { echo "DUL file not found: $DUL_FILE" >&2; exit 1; }
+  ONTO+=("$DUL_FILE" "$DEPS/d0.owl")
 fi
 ONTO+=("$ECMO"/ecmo-*.ttl "$ECMO"/0.3.1-alignments/*.ttl)
 DATA=()
@@ -86,12 +106,13 @@ if [ "$WITH_DATA" -eq 1 ]; then
     [ -f "$ECMO/0.3.1-unittests/$f" ] && DATA+=("$ECMO/0.3.1-unittests/$f")
   done
 fi
-echo "Ontology files: ${#ONTO[@]}   data files: ${#DATA[@]}   DUL/d0: $([ "$WITH_DUL" -eq 1 ] && echo yes || echo no)   repetitions: $REPS"
+echo "Ontology files: ${#ONTO[@]}   data files: ${#DATA[@]}   DUL/d0: $([ "$WITH_DUL" -eq 1 ] && echo "$(basename "$DUL_FILE")" || echo no)   repetitions: $REPS"
 
 # --- runs -------------------------------------------------------------------------
 STAMP="$(date +%Y%m%d_%H%M%S)"
 DATA_TAG=$([ "$WITH_DATA" -eq 1 ] && echo data || echo nodata)
-[ "$WITH_DUL" -eq 1 ] && DATA_TAG="${DATA_TAG}_dul"
+[ "$WITH_DUL" -eq 1 ] && DATA_TAG="${DATA_TAG}_${DUL_TAG}"
+[ "$CONSISTENCY" -eq 1 ] && DATA_TAG="${DATA_TAG}_consistency"
 MODES=$([ "$SAMEAS" = both ] && echo "on off" || echo "$SAMEAS")
 
 for mode in $MODES; do
@@ -103,5 +124,6 @@ for mode in $MODES; do
   # benchmark_rulesets.py falls back to university.ttl
   args=(--ontology "${ONTO[@]}" -n "$REPS" "$flag" -o "$out" --data ${DATA[@]+"${DATA[@]}"})
   [ "${#RULESETS[@]}" -gt 0 ] && args+=(--rulesets "${RULESETS[@]}")
+  [ "$CONSISTENCY" -eq 1 ] && args+=(--check-inconsistencies)
   python3 "$HERE/benchmark_rulesets.py" "${args[@]}" ${EXTRA[@]+"${EXTRA[@]}"}
 done

@@ -31,6 +31,8 @@ import base64
 import csv
 import gzip
 import json
+import os
+import re
 import statistics
 import sys
 import time
@@ -215,6 +217,20 @@ class GraphDB:
 
 
 # --------------------------------------------------------------------------- benchmark
+def print_files(label, files):
+    """List the files that will be loaded, in loading order, with their sizes."""
+    total = sum(f.stat().st_size for f in files)
+    print(f"{label} files: {len(files)} ({total / 1024:,.0f} KB)")
+    for i, f in enumerate(files, 1):
+        try:
+            shown = os.path.relpath(f)
+        except ValueError:
+            shown = str(f)
+        if shown.startswith("../../"):
+            shown = str(f)
+        print(f"  {i:>3}. {shown}  ({f.stat().st_size / 1024:,.1f} KB)")
+
+
 def timed_load(db, repo, files, tag, what):
     if not files:
         return 0.0
@@ -237,10 +253,12 @@ def run(args):
     for p in onto + data:
         if not p.exists():
             sys.exit(f"File not found: {p}")
+    print_files("Ontology", onto)
+    print_files("Data", data)
 
     out = Path(args.output or f"benchmark_rulesets_{datetime.now():%Y%m%d_%H%M%S}.csv")
     fields = ["ruleset", "run", "warmup", "onto_load_s", "data_load_s", "total_load_s",
-              "explicit", "inferred", "total", "inferred_ratio", "error"]
+              "explicit", "inferred", "total", "inferred_ratio", "consistent", "error"]
     rows = []
     runs = args.warmup + args.repetitions
 
@@ -260,6 +278,7 @@ def run(args):
                     t_onto = timed_load(db, repo, onto, tag, "ontology")
                     t_data = timed_load(db, repo, data, tag, "data")
                     ex, inf, tot = db.size(repo)
+                    row["consistent"] = True if args.check_inconsistencies else ""
                     row.update(onto_load_s=round(t_onto, 3), data_load_s=round(t_data, 3),
                                total_load_s=round(t_onto + t_data, 3),
                                explicit=ex, inferred=inf, total=tot,
@@ -267,8 +286,15 @@ def run(args):
                     print(f"{tag:<34} onto {t_onto:8.2f}s  data {t_data:8.2f}s  "
                           f"explicit {ex:>12,}  inferred {inf:>12,}")
                 except Exception as e:  # keep going with the other rulesets
-                    row["error"] = str(e)[:300]
-                    print(f"{tag:<34} ERROR: {e}")
+                    msg = str(e)
+                    if "consistency" in msg.lower():
+                        # GraphDB rejects the whole commit (HTTP 500) when a
+                        # consistency rule fires; the message names the rule
+                        row["consistent"] = False
+                        print(f"{tag:<34} INCONSISTENT: {consistency_summary(msg)}")
+                    else:
+                        print(f"{tag:<34} ERROR: {msg}")
+                    row["error"] = msg[:1000]
                 finally:
                     if not (args.keep and i == runs - 1):
                         try:
@@ -283,6 +309,15 @@ def run(args):
     print(f"\nRaw results: {out.resolve()}")
 
 
+def consistency_summary(msg):
+    """Shorten a GraphDB consistency-violation message to its essentials."""
+    m = re.search(r"Consistency check\s+(\S+)\s+failed", msg)
+    rule = m.group(1) if m else None
+    first = msg.split("\n")
+    detail = next((l.strip() for l in first[1:] if l.strip()), "")
+    return (f"rule {rule}" if rule else msg[:200]) + (f" -- {detail[:200]}" if detail and rule else "")
+
+
 def summarize(rows, rulesets):
     ok = [r for r in rows if not r["warmup"] and not r.get("error")]
     base_times = [r["total_load_s"] for r in ok if r["ruleset"] == "empty"]
@@ -294,7 +329,9 @@ def summarize(rows, rulesets):
     for rs in rulesets:
         rr = [r for r in ok if r["ruleset"] == rs]
         if not rr:
-            print(f"{rs:<22}{0:>5}   (no successful runs)")
+            bad = [r for r in rows if r["ruleset"] == rs and r.get("consistent") is False]
+            note = "INCONSISTENT" if bad else "(no successful runs)"
+            print(f"{rs:<22}{0:>5}   {note}")
             continue
         t = [r["total_load_s"] for r in rr]
         med = statistics.median(t)
