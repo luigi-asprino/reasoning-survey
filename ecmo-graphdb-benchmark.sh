@@ -108,6 +108,19 @@ if [ "$WITH_DATA" -eq 1 ]; then
 fi
 echo "Ontology files: ${#ONTO[@]}   data files: ${#DATA[@]}   DUL/d0: $([ "$WITH_DUL" -eq 1 ] && echo "$(basename "$DUL_FILE")" || echo no)   repetitions: $REPS"
 
+list_files() {  # label file...
+  local label="$1"; shift
+  echo "$label ($#):"
+  local i=1 f
+  for f in "$@"; do
+    local full; full="$(cd "$(dirname "$f")" && pwd)/$(basename "$f")"
+    printf '  %3d. %s  (%s KB)\n' "$i" "$full" "$(( $(wc -c < "$f") / 1024 ))"
+    i=$((i + 1))
+  done
+}
+list_files "Ontology files" "${ONTO[@]}"
+if [ "${#DATA[@]}" -gt 0 ]; then list_files "Data files" "${DATA[@]}"; else echo "Data files: none"; fi
+
 # --- runs -------------------------------------------------------------------------
 STAMP="$(date +%Y%m%d_%H%M%S)"
 DATA_TAG=$([ "$WITH_DATA" -eq 1 ] && echo data || echo nodata)

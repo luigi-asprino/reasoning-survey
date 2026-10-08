@@ -15,6 +15,8 @@ relating those regimes to Description Logic families and OWL 2 profiles.
 | `reasoning_report.md` / `.json` | Output of the last run. |
 | `benchmark_rulesets.py` | Measures how each ruleset affects loading time and materialisation size. |
 | `ecmo-graphdb-benchmark.sh` | Runs the loading-time benchmark on the ECMO ontology. |
+| `check_disjointness.py` | Lists every disjointness violation in ECMO + DUL + case data, with derivations (needs rdflib). |
+| `ecmo-inconsistencies.md` | Why ECMO 0.3.1 + DUL + the case fixtures is inconsistent, and a verified fix set. |
 | `notes/dl-owl-expressivity.tex` | Notes on DL naming, OWL 2 profiles, GraphDB rulesets as Horn fragments, empirical results, and available reasoners. |
 
 ## Setup
@@ -139,6 +141,10 @@ worth comparing both sameAs modes. Results go to
 
 ## Findings so far
 
+- ECMO 0.3.1 + DUL + the Ebola/Hondius case fixtures is inconsistent: 31
+  individuals fall in disjoint DUL classes (Event/Object, Object/Quality), caused
+  by five groups of alignments in `ecmo-property-alignments.ttl`. Details and a
+  verified fix set in [`ecmo-inconsistencies.md`](ecmo-inconsistencies.md).
 - `rdfsplus-optimized` applies neither `rdfs:domain` nor `rdfs:range`
   (Q1, Q2 empty), although inverse, symmetric and transitive properties work.
   `owl2-rl-optimized` applies them correctly, so the problem is specific to
