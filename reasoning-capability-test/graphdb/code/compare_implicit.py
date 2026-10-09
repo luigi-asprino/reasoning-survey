@@ -16,12 +16,14 @@ It then reports, side by side:
   - the triples only one ruleset infers, grouped by predicate, with examples.
 
 Usage:
-  python compare_implicit.py                                    # university.ttl, owl2-ql vs owl2-rl
-  python compare_implicit.py --data university.ttl --rulesets owl2-ql-optimized owl2-rl-optimized
-  python compare_implicit.py --data onto.ttl data.ttl --keep --report implicit_ecmo.md
+  python compare_implicit.py                                    # ../data/university.ttl, owl2-ql vs owl2-rl
+  python compare_implicit.py --data ../data/university.ttl --rulesets owl2-ql-optimized owl2-rl-optimized
+  python compare_implicit.py --data onto.ttl data.ttl --keep --report ../results/implicit_ecmo.md
 
-Writes a Markdown report (default: implicit_report.md).
-Standard library only; reuses the GraphDB client of benchmark_rulesets.py.
+Writes a Markdown report (default: ../results/implicit_report.md).
+Default paths are relative to this script, so it can be run from any directory.
+Standard library only; reuses the GraphDB client of
+loading-time-test/graphdb/code/benchmark_rulesets.py.
 """
 import argparse
 import json
@@ -30,7 +32,14 @@ import urllib.parse
 from collections import Counter
 from pathlib import Path
 
-from benchmark_rulesets import GraphDB
+HERE = Path(__file__).resolve().parent
+DATA_DIR = HERE.parent / "data"
+RESULTS_DIR = HERE.parent / "results"
+# the GraphDB REST client lives with the loading-time benchmark
+BENCHMARK_CODE = HERE.parents[2] / "loading-time-test" / "graphdb" / "code"
+sys.path.insert(0, str(BENCHMARK_CODE))
+
+from benchmark_rulesets import GraphDB  # noqa: E402
 
 RDF_TYPE = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
 IMPLICIT_QUERY = """PREFIX onto: <http://www.ontotext.com/>
@@ -130,7 +139,8 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--url", default="http://localhost:7200", help="GraphDB base URL")
     ap.add_argument("--auth", help="user:password, if security is enabled")
-    ap.add_argument("--data", nargs="+", default=["university.ttl"], help="files to load (ontology and data)")
+    ap.add_argument("--data", nargs="+", default=[str(DATA_DIR / "university.ttl")],
+                    help="files to load (ontology and data)")
     ap.add_argument("--rulesets", nargs=2, metavar=("A", "B"),
                     default=["owl2-ql-optimized", "owl2-rl-optimized"])
     ap.add_argument("--prefix", default="implicit-", help="prefix of the temporary repository ids")
@@ -140,7 +150,7 @@ def main():
     ap.add_argument("--entity-index-size", default="10000000")
     ap.add_argument("--keep", action="store_true", help="keep the two repositories after the run")
     ap.add_argument("--examples", type=int, default=5, help="example triples per predicate")
-    ap.add_argument("--report", default="implicit_report.md")
+    ap.add_argument("--report", default=str(RESULTS_DIR / "implicit_report.md"))
     args = ap.parse_args()
 
     files = [Path(f) for f in args.data]

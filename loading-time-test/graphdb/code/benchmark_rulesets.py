@@ -13,9 +13,14 @@ GraphDB materialises inferences at load time (forward chaining) and the RDF4J
 statements endpoint answers only after the commit, so wall-clock load time
 includes the full cost of each entailment regime.
 
-Results go to a CSV file (one row per run); a median summary is printed.
+Results go to a CSV file (one row per run, default:
+../results/benchmark_rulesets_<timestamp>.csv); a median summary is printed.
 Temporary repositories are named bench-ruleset-<ruleset>, so the
 reasoning-test-* repositories are never touched.
+
+The default data file is the small test KG of the reasoning-capability tests
+(reasoning-capability-test/graphdb/data/university.ttl). Default paths are
+relative to this script, so it can be run from any directory.
 
 Usage:
   python benchmark_rulesets.py                                  # university.ttl, all rulesets
@@ -43,8 +48,12 @@ import uuid
 from datetime import datetime
 from pathlib import Path
 
+HERE = Path(__file__).resolve().parent
+RESULTS_DIR = HERE.parent / "results"
+DEFAULT_DATA = HERE.parents[2] / "reasoning-capability-test" / "graphdb" / "data" / "university.ttl"
+
 # rdfsplus / rdfsplus-optimized are deliberately excluded: they do not apply
-# rdfs:domain / rdfs:range (see README, "Findings so far").
+# rdfs:domain / rdfs:range (see reasoning-capability-test/graphdb/README.md).
 DEFAULT_RULESETS = [
     "empty",
     "rdfs", 
@@ -256,7 +265,8 @@ def run(args):
     print_files("Ontology", onto)
     print_files("Data", data)
 
-    out = Path(args.output or f"benchmark_rulesets_{datetime.now():%Y%m%d_%H%M%S}.csv")
+    out = Path(args.output or RESULTS_DIR / f"benchmark_rulesets_{datetime.now():%Y%m%d_%H%M%S}.csv")
+    out.parent.mkdir(parents=True, exist_ok=True)
     fields = ["ruleset", "run", "warmup", "onto_load_s", "data_load_s", "total_load_s",
               "explicit", "inferred", "total", "inferred_ratio", "consistent", "error"]
     rows = []
@@ -347,7 +357,7 @@ def main():
     ap.add_argument("--url", default="http://localhost:7200", help="GraphDB base URL")
     ap.add_argument("--auth", help="user:password, if security is enabled")
     ap.add_argument("--ontology", nargs="*", default=[], help="TBox files, loaded (and timed) first")
-    ap.add_argument("--data", nargs="*", default=["university.ttl"],
+    ap.add_argument("--data", nargs="*", default=[str(DEFAULT_DATA)],
                     help="data files (.ttl .nt .nq .trig .rdf .owl .jsonld .n3, optionally .gz); "
                          "pass --data with no files to load the ontology only")
     ap.add_argument("--rulesets", nargs="+", default=DEFAULT_RULESETS)
@@ -359,7 +369,7 @@ def main():
     ap.add_argument("--check-inconsistencies", action=argparse.BooleanOptionalAction, default=False)
     ap.add_argument("--entity-index-size", default="10000000")
     ap.add_argument("--keep", action="store_true", help="keep the last repository of each ruleset")
-    ap.add_argument("-o", "--output", help="CSV output path")
+    ap.add_argument("-o", "--output", help="CSV output path (default: ../results/benchmark_rulesets_<timestamp>.csv)")
     run(ap.parse_args())
 
 

@@ -1,16 +1,17 @@
 #!/usr/bin/env python3
 """
-Run the queries in queries.rq against several GraphDB repositories
+Run the queries in ../data/queries.rq against several GraphDB repositories
 (one per ruleset) and compare the results side by side.
 
 Usage:
   python run_reasoning_tests.py                      # auto-discover reasoning-test-* repos
-  python run_reasoning_tests.py --load               # clear + load university.ttl first
+  python run_reasoning_tests.py --load               # clear + load ../data/university.ttl first
   python run_reasoning_tests.py --repos a b c        # explicit repo list
   python run_reasoning_tests.py --only Q1 Q5         # subset of queries
   python run_reasoning_tests.py --no-infer           # explicit data only (baseline)
 
-Writes a Markdown report (default: reasoning_report.md) and a JSON dump.
+Writes a Markdown report (default: ../results/reasoning_report.md) and a JSON dump.
+Default paths are relative to this script, so it can be run from any directory.
 Standard library only.
 """
 import argparse
@@ -21,6 +22,10 @@ import urllib.error
 import urllib.parse
 import urllib.request
 from pathlib import Path
+
+HERE = Path(__file__).resolve().parent
+DATA_DIR = HERE.parent / "data"
+RESULTS_DIR = HERE.parent / "results"
 
 DEFAULT_REPO_PREFIX = "reasoning-test-"
 SPARQL_JSON = "application/sparql-results+json"
@@ -140,13 +145,13 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--base", default="http://localhost:7200")
     ap.add_argument("--repos", nargs="*", help=f"default: all repos starting with '{DEFAULT_REPO_PREFIX}'")
-    ap.add_argument("--queries", default="queries.rq")
-    ap.add_argument("--data", default="university.ttl")
+    ap.add_argument("--queries", default=str(DATA_DIR / "queries.rq"))
+    ap.add_argument("--data", default=str(DATA_DIR / "university.ttl"))
     ap.add_argument("--load", action="store_true", help="clear each repo and load --data first")
     ap.add_argument("--no-clear", action="store_true", help="with --load, append instead of clearing")
     ap.add_argument("--only", nargs="*", help="query ids to run, e.g. Q1 Q5")
     ap.add_argument("--no-infer", action="store_true", help="query explicit statements only")
-    ap.add_argument("--report", default="reasoning_report.md")
+    ap.add_argument("--report", default=str(RESULTS_DIR / "reasoning_report.md"))
     args = ap.parse_args()
 
     base = args.base.rstrip("/")

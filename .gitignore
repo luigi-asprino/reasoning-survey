@@ -330,10 +330,11 @@ TSWLatexianTemp*
 # option is specified. Footnotes are the stored in a file with suffix Notes.bib.
 # Uncomment the next line to have this generated file ignored.
 #*Notes.bib
-# ruleset benchmark output
+# loading-time-test/<store>/results: raw benchmark output
+# (rename a run to settingN-*.csv to track it)
 benchmark_rulesets_*.csv
-
-# ECMO benchmark: downloaded imports and results
-ecmo-deps/
 ecmo_benchmark_*.csv
+
+# loading-time-test/graphdb/data: downloaded DUL / d0
+ecmo-deps/
 __pycache__/

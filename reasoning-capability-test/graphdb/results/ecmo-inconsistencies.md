@@ -30,13 +30,13 @@ re-checked: after applying them, no disjointness violation remains.
 ## How it was found
 
 1. GraphDB, with consistency checks on
-   (`./ecmo-graphdb-benchmark.sh --dul-lite --consistency --rulesets owl2-ql-optimized owl2-rl-optimized`).
+   (`loading-time-test/graphdb/code/ecmo-graphdb-benchmark.sh --dul-lite --consistency --rulesets owl2-ql-optimized owl2-rl-optimized`).
    It rejects the load of `ecmo-ebola-case.ttl` with rule `cax_dw_1`
    (OWL 2 RL cax-dw: an individual in two disjoint classes). GraphDB stops at the
    first violation, so each ruleset reports only one:
    - owl2-rl: `agency:ECRC` is a `dul:Object` and a `dul:Quality` (group A);
    - owl2-ql: `ebola:s_nadira_initial` is a `dul:Object` and a `dul:Event` (group C).
-2. `check_disjointness.py`, which computes the relevant OWL 2 RL type inferences
+2. `../code/check_disjointness.py`, which computes the relevant OWL 2 RL type inferences
    and lists **all** violations with their derivations, grouped by the
    alignments involved.
 
@@ -291,14 +291,17 @@ re-checked.
 
 ## Reproducing
 
+Paths below are relative to the repository root.
+
 ```bash
 # all violations with derivations (needs rdflib)
-python3 check_disjointness.py                       # ECMO + DUL-lite + case fixtures
-python3 check_disjointness.py --dul ecmo-deps/DUL.owl
-python3 check_disjointness.py --no-data             # ontology only: 0 violations
-python3 check_disjointness.py --examples 3          # more derivations per group
+CD=reasoning-capability-test/graphdb/code
+python3 $CD/check_disjointness.py                   # ECMO + DUL-lite + case fixtures
+python3 $CD/check_disjointness.py --dul loading-time-test/graphdb/data/ecmo-deps/DUL.owl
+python3 $CD/check_disjointness.py --no-data         # ontology only: 0 violations
+python3 $CD/check_disjointness.py --examples 3      # more derivations per group
 
 # GraphDB (stops at the first violation)
-./ecmo-graphdb-benchmark.sh --dul-lite --consistency -n 1 \
+loading-time-test/graphdb/code/ecmo-graphdb-benchmark.sh --dul-lite --consistency -n 1 \
     --rulesets owl2-ql-optimized owl2-rl-optimized
 ```

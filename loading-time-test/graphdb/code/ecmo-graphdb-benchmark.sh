@@ -11,13 +11,13 @@
 #   --data | --no-data     also load the case fixtures as data (default: --data)
 #   --dul | --no-dul       also load DUL and d0 as ontology (default: --no-dul)
 #   --dul-lite             like --dul, but dul:associatedWith is neither transitive
-#                          nor symmetric (dul-variants/DUL-lite.ttl)
+#                          nor symmetric (../data/dul-variants/DUL-lite.ttl)
 #   --dul-flat             like --dul, but no DUL property is transitive or
-#                          symmetric (dul-variants/DUL-flat.ttl)
+#                          symmetric (../data/dul-variants/DUL-flat.ttl)
 #   --dul-file FILE        like --dul, but load FILE instead of DUL
 #   --consistency          enable GraphDB consistency checks; an inconsistent load
 #                          is reported as INCONSISTENT with the violated rule
-#   --ecmo DIR             ECMO release folder (default: ../ecmo-0.3.1-dl42-patched)
+#   --ecmo DIR             ECMO release folder (default: JRC/ecmo/0.3.1_audited)
 #   -n N                   measured repetitions per ruleset (default: 10)
 #   --rulesets R1 R2 ...   rulesets to test (default: all but rdfsplus*)
 #   -h, --help             show this help
@@ -32,8 +32,10 @@
 #   ./ecmo-graphdb-benchmark.sh -- --url http://other-host:7200 --warmup 0
 set -euo pipefail
 
-HERE="$(cd "$(dirname "$0")" && pwd)"
-ECMO="$HERE/../ecmo/0.3.1_audited"
+HERE="$(cd "$(dirname "$0")" && pwd)"          # .../loading-time-test/graphdb/code
+DATA_DIR="$(cd "$HERE/../data" && pwd)"
+RESULTS_DIR="$(cd "$HERE/../results" && pwd)"
+ECMO="$HERE/../../../../ecmo/0.3.1_audited"     # JRC/ecmo, next to the reasoning repo
 SAMEAS="both"
 WITH_DATA=1
 WITH_DUL=0
@@ -53,8 +55,8 @@ while [ $# -gt 0 ]; do
     --no-data) WITH_DATA=0; shift ;;
     --dul)      WITH_DUL=1; DUL_FILE=""; DUL_TAG="dul"; shift ;;
     --no-dul)   WITH_DUL=0; shift ;;
-    --dul-lite) WITH_DUL=1; DUL_FILE="$HERE/dul-variants/DUL-lite.ttl"; DUL_TAG="dul-lite"; shift ;;
-    --dul-flat) WITH_DUL=1; DUL_FILE="$HERE/dul-variants/DUL-flat.ttl"; DUL_TAG="dul-flat"; shift ;;
+    --dul-lite) WITH_DUL=1; DUL_FILE="$DATA_DIR/dul-variants/DUL-lite.ttl"; DUL_TAG="dul-lite"; shift ;;
+    --dul-flat) WITH_DUL=1; DUL_FILE="$DATA_DIR/dul-variants/DUL-flat.ttl"; DUL_TAG="dul-flat"; shift ;;
     --dul-file) WITH_DUL=1; DUL_FILE="${2:-}"; DUL_TAG="dul-$(basename "${2:-custom}" | sed 's/\.[^.]*$//')"; shift 2 ;;
     --consistency) CONSISTENCY=1; shift ;;
     --ecmo)    ECMO="${2:-}"; shift 2 ;;
@@ -77,7 +79,7 @@ esac
 ECMO="$(cd "$ECMO" && pwd)"
 
 # --- external imports (DUL, d0) -------------------------------------------------
-DEPS="$HERE/ecmo-deps"
+DEPS="$DATA_DIR/ecmo-deps"
 mkdir -p "$DEPS"
 fetch() {  # url file
   if [ ! -s "$DEPS/$2" ]; then
@@ -130,7 +132,7 @@ MODES=$([ "$SAMEAS" = both ] && echo "on off" || echo "$SAMEAS")
 
 for mode in $MODES; do
   flag=$([ "$mode" = on ] && echo --no-disable-sameas || echo --disable-sameas)
-  out="$HERE/ecmo_benchmark_sameas-${mode}_${DATA_TAG}_${STAMP}.csv"
+  out="$RESULTS_DIR/ecmo_benchmark_sameas-${mode}_${DATA_TAG}_${STAMP}.csv"
   echo
   echo "=== $(date +%H:%M:%S) start loading: owl:sameAs $mode, ${DATA_TAG//_/, } ==="
   # --data is always passed (possibly with no files), otherwise

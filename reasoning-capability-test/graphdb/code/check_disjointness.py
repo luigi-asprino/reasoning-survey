@@ -15,8 +15,13 @@ Not applied: owl:sameAs, property chains, cardinalities, datatypes.
 
 Usage:
   python check_disjointness.py                                   # defaults below
-  python check_disjointness.py --dul ecmo-deps/DUL.owl --data my-case.ttl
+  python check_disjointness.py --dul ../../../loading-time-test/graphdb/data/ecmo-deps/DUL.owl --data my-case.ttl
   python check_disjointness.py --no-data                         # ontology only
+
+Defaults (relative to this script, so it can be run from any directory):
+  ECMO   ../../../../ecmo/0.3.1_audited
+  DUL    loading-time-test/graphdb/data/dul-variants/DUL-lite.ttl
+  d0     loading-time-test/graphdb/data/ecmo-deps/d0.owl
 
 Requires rdflib (pip install rdflib).
 """
@@ -31,6 +36,10 @@ from rdflib import OWL, RDF, RDFS, BNode, Literal, URIRef
 from rdflib.collection import Collection
 
 HERE = Path(__file__).resolve().parent
+REPO_ROOT = HERE.parents[2]                     # .../reasoning
+ECMO_DIR = REPO_ROOT.parent / "ecmo" / "0.3.1_audited"
+# DUL variants and downloaded imports are shared with the loading-time benchmark
+SHARED_DATA = REPO_ROOT / "loading-time-test" / "graphdb" / "data"
 DUL_NS = "http://www.ontologydesignpatterns.org/ont/"
 CASES = ["ecmo-ebola-case.ttl", "ecmo-hantavirus-case.ttl",
          "ecmo-coreference-pattern-fixture.ttl", "ecmo-phsm-fixtures.ttl"]
@@ -251,10 +260,10 @@ class Reasoner:
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--ecmo", default=str(HERE.parent / "ecmo-0.3.1-dl42-patched"))
-    ap.add_argument("--dul", default=str(HERE / "dul-variants" / "DUL-lite.ttl"),
+    ap.add_argument("--ecmo", default=str(ECMO_DIR), help="ECMO release folder")
+    ap.add_argument("--dul", default=str(SHARED_DATA / "dul-variants" / "DUL-lite.ttl"),
                     help="DUL file (default: DUL-lite; the disjointness results are the same as full DUL)")
-    ap.add_argument("--d0", default=str(HERE / "ecmo-deps" / "d0.owl"))
+    ap.add_argument("--d0", default=str(SHARED_DATA / "ecmo-deps" / "d0.owl"))
     ap.add_argument("--data", nargs="*", help="data files (default: the ECMO case fixtures)")
     ap.add_argument("--no-data", action="store_true")
     ap.add_argument("--examples", type=int, default=1, help="derivations shown per group (default 1)")
