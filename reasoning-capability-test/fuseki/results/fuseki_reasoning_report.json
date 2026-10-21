@@ -1,0 +1,1166 @@
+{
+  "Q1": {
+    "none": {
+      "vars": [
+        "t"
+      ],
+      "rows": []
+    },
+    "transitive": {
+      "vars": [
+        "t"
+      ],
+      "rows": []
+    },
+    "rdfs": {
+      "vars": [
+        "t"
+      ],
+      "rows": [
+        [
+          "ex:Academic"
+        ],
+        [
+          "ex:Person"
+        ],
+        [
+          "rdfs:Resource"
+        ]
+      ]
+    },
+    "owl-micro": {
+      "vars": [
+        "t"
+      ],
+      "rows": [
+        [
+          "_:b"
+        ],
+        [
+          "ex:Academic"
+        ],
+        [
+          "ex:Docente"
+        ],
+        [
+          "ex:Person"
+        ],
+        [
+          "ex:Staff"
+        ],
+        [
+          "ex:Supervisor"
+        ],
+        [
+          "owl:Thing"
+        ],
+        [
+          "rdfs:Resource"
+        ]
+      ]
+    },
+    "owl-mini": {
+      "vars": [
+        "t"
+      ],
+      "rows": [
+        [
+          "_:b"
+        ],
+        [
+          "ex:Academic"
+        ],
+        [
+          "ex:Docente"
+        ],
+        [
+          "ex:Person"
+        ],
+        [
+          "ex:Staff"
+        ],
+        [
+          "ex:Supervisor"
+        ],
+        [
+          "owl:Thing"
+        ],
+        [
+          "rdfs:Resource"
+        ]
+      ]
+    },
+    "owl": {
+      "vars": [
+        "t"
+      ],
+      "rows": [
+        [
+          "_:b"
+        ],
+        [
+          "ex:Academic"
+        ],
+        [
+          "ex:Docente"
+        ],
+        [
+          "ex:Person"
+        ],
+        [
+          "ex:Staff"
+        ],
+        [
+          "ex:Supervisor"
+        ],
+        [
+          "owl:Thing"
+        ],
+        [
+          "rdfs:Resource"
+        ]
+      ]
+    }
+  },
+  "Q2": {
+    "none": {
+      "vars": [
+        "who",
+        "c"
+      ],
+      "rows": []
+    },
+    "transitive": {
+      "vars": [
+        "who",
+        "c"
+      ],
+      "rows": []
+    },
+    "rdfs": {
+      "vars": [
+        "who",
+        "c"
+      ],
+      "rows": [
+        [
+          "ex:alice",
+          "ex:kg101"
+        ],
+        [
+          "ex:alice",
+          "ex:kgLab"
+        ]
+      ]
+    },
+    "owl-micro": {
+      "vars": [
+        "who",
+        "c"
+      ],
+      "rows": [
+        [
+          "ex:alice",
+          "ex:kg101"
+        ],
+        [
+          "ex:alice",
+          "ex:kgLab"
+        ],
+        [
+          "ex:bruno",
+          "ex:db201"
+        ]
+      ]
+    },
+    "owl-mini": {
+      "vars": [
+        "who",
+        "c"
+      ],
+      "rows": [
+        [
+          "ex:a_rossi",
+          "ex:kg101"
+        ],
+        [
+          "ex:a_rossi",
+          "ex:kgLab"
+        ],
+        [
+          "ex:alice",
+          "ex:kg101"
+        ],
+        [
+          "ex:alice",
+          "ex:kgLab"
+        ],
+        [
+          "ex:bruno",
+          "ex:db201"
+        ],
+        [
+          "ex:profAlice",
+          "ex:kg101"
+        ],
+        [
+          "ex:profAlice",
+          "ex:kgLab"
+        ]
+      ]
+    },
+    "owl": {
+      "vars": [
+        "who",
+        "c"
+      ],
+      "rows": [
+        [
+          "ex:a_rossi",
+          "ex:kg101"
+        ],
+        [
+          "ex:a_rossi",
+          "ex:kgLab"
+        ],
+        [
+          "ex:alice",
+          "ex:kg101"
+        ],
+        [
+          "ex:alice",
+          "ex:kgLab"
+        ],
+        [
+          "ex:bruno",
+          "ex:db201"
+        ],
+        [
+          "ex:profAlice",
+          "ex:kg101"
+        ],
+        [
+          "ex:profAlice",
+          "ex:kgLab"
+        ]
+      ]
+    }
+  },
+  "Q3": {
+    "none": {
+      "vars": [
+        "s",
+        "c",
+        "u"
+      ],
+      "rows": [
+        [
+          "",
+          "",
+          "ex:dept"
+        ]
+      ]
+    },
+    "transitive": {
+      "vars": [
+        "s",
+        "c",
+        "u"
+      ],
+      "rows": [
+        [
+          "",
+          "",
+          "ex:dept"
+        ]
+      ]
+    },
+    "rdfs": {
+      "vars": [
+        "s",
+        "c",
+        "u"
+      ],
+      "rows": [
+        [
+          "",
+          "",
+          "ex:dept"
+        ]
+      ]
+    },
+    "owl-micro": {
+      "vars": [
+        "s",
+        "c",
+        "u"
+      ],
+      "rows": [
+        [
+          "",
+          "",
+          "ex:dept"
+        ],
+        [
+          "",
+          "",
+          "ex:faculty"
+        ],
+        [
+          "",
+          "",
+          "ex:unibo"
+        ],
+        [
+          "",
+          "ex:alice",
+          ""
+        ],
+        [
+          "ex:alice",
+          "",
+          ""
+        ]
+      ]
+    },
+    "owl-mini": {
+      "vars": [
+        "s",
+        "c",
+        "u"
+      ],
+      "rows": [
+        [
+          "",
+          "",
+          "ex:dept"
+        ],
+        [
+          "",
+          "",
+          "ex:faculty"
+        ],
+        [
+          "",
+          "",
+          "ex:unibo"
+        ],
+        [
+          "",
+          "ex:a_rossi",
+          ""
+        ],
+        [
+          "",
+          "ex:alice",
+          ""
+        ],
+        [
+          "",
+          "ex:profAlice",
+          ""
+        ],
+        [
+          "ex:a_rossi",
+          "",
+          ""
+        ],
+        [
+          "ex:alice",
+          "",
+          ""
+        ],
+        [
+          "ex:profAlice",
+          "",
+          ""
+        ]
+      ]
+    },
+    "owl": {
+      "vars": [
+        "s",
+        "c",
+        "u"
+      ],
+      "rows": [
+        [
+          "",
+          "",
+          "ex:dept"
+        ],
+        [
+          "",
+          "",
+          "ex:faculty"
+        ],
+        [
+          "",
+          "",
+          "ex:unibo"
+        ],
+        [
+          "",
+          "ex:a_rossi",
+          ""
+        ],
+        [
+          "",
+          "ex:alice",
+          ""
+        ],
+        [
+          "",
+          "ex:profAlice",
+          ""
+        ],
+        [
+          "ex:a_rossi",
+          "",
+          ""
+        ],
+        [
+          "ex:alice",
+          "",
+          ""
+        ],
+        [
+          "ex:profAlice",
+          "",
+          ""
+        ]
+      ]
+    }
+  },
+  "Q4": {
+    "none": {
+      "vars": [
+        "d"
+      ],
+      "rows": []
+    },
+    "transitive": {
+      "vars": [
+        "d"
+      ],
+      "rows": []
+    },
+    "rdfs": {
+      "vars": [
+        "d"
+      ],
+      "rows": []
+    },
+    "owl-micro": {
+      "vars": [
+        "d"
+      ],
+      "rows": [
+        [
+          "ex:alice"
+        ],
+        [
+          "ex:bruno"
+        ]
+      ]
+    },
+    "owl-mini": {
+      "vars": [
+        "d"
+      ],
+      "rows": [
+        [
+          "ex:a_rossi"
+        ],
+        [
+          "ex:alice"
+        ],
+        [
+          "ex:bruno"
+        ],
+        [
+          "ex:profAlice"
+        ]
+      ]
+    },
+    "owl": {
+      "vars": [
+        "d"
+      ],
+      "rows": [
+        [
+          "ex:a_rossi"
+        ],
+        [
+          "ex:alice"
+        ],
+        [
+          "ex:bruno"
+        ],
+        [
+          "ex:profAlice"
+        ]
+      ]
+    }
+  },
+  "Q5": {
+    "none": {
+      "vars": [
+        "same",
+        "hp"
+      ],
+      "rows": []
+    },
+    "transitive": {
+      "vars": [
+        "same",
+        "hp"
+      ],
+      "rows": []
+    },
+    "rdfs": {
+      "vars": [
+        "same",
+        "hp"
+      ],
+      "rows": []
+    },
+    "owl-micro": {
+      "vars": [
+        "same",
+        "hp"
+      ],
+      "rows": []
+    },
+    "owl-mini": {
+      "vars": [
+        "same",
+        "hp"
+      ],
+      "rows": [
+        [
+          "ex:a_rossi",
+          "<http://example.org/~arossi>"
+        ],
+        [
+          "ex:alice",
+          "<http://example.org/~arossi>"
+        ],
+        [
+          "ex:profAlice",
+          "<http://example.org/~arossi>"
+        ]
+      ]
+    },
+    "owl": {
+      "vars": [
+        "same",
+        "hp"
+      ],
+      "rows": [
+        [
+          "ex:a_rossi",
+          "<http://example.org/~arossi>"
+        ],
+        [
+          "ex:alice",
+          "<http://example.org/~arossi>"
+        ],
+        [
+          "ex:profAlice",
+          "<http://example.org/~arossi>"
+        ]
+      ]
+    }
+  },
+  "Q6": {
+    "none": {
+      "vars": [
+        "c1",
+        "topic",
+        "s",
+        "r"
+      ],
+      "rows": [
+        [
+          "ex:sw301",
+          "",
+          "",
+          ""
+        ]
+      ]
+    },
+    "transitive": {
+      "vars": [
+        "c1",
+        "topic",
+        "s",
+        "r"
+      ],
+      "rows": [
+        [
+          "ex:sw301",
+          "",
+          "",
+          ""
+        ]
+      ]
+    },
+    "rdfs": {
+      "vars": [
+        "c1",
+        "topic",
+        "s",
+        "r"
+      ],
+      "rows": [
+        [
+          "ex:sw301",
+          "",
+          "",
+          ""
+        ]
+      ]
+    },
+    "owl-micro": {
+      "vars": [
+        "c1",
+        "topic",
+        "s",
+        "r"
+      ],
+      "rows": [
+        [
+          "",
+          "",
+          "ex:alice",
+          ""
+        ],
+        [
+          "",
+          "ex:SemanticWeb",
+          "",
+          ""
+        ],
+        [
+          "ex:kg101",
+          "",
+          "",
+          ""
+        ],
+        [
+          "ex:sw301",
+          "",
+          "",
+          ""
+        ]
+      ]
+    },
+    "owl-mini": {
+      "vars": [
+        "c1",
+        "topic",
+        "s",
+        "r"
+      ],
+      "rows": [
+        [
+          "",
+          "",
+          "",
+          "ex:elena"
+        ],
+        [
+          "",
+          "",
+          "ex:a_rossi",
+          ""
+        ],
+        [
+          "",
+          "",
+          "ex:alice",
+          ""
+        ],
+        [
+          "",
+          "",
+          "ex:profAlice",
+          ""
+        ],
+        [
+          "",
+          "ex:SemanticWeb",
+          "",
+          ""
+        ],
+        [
+          "ex:kg101",
+          "",
+          "",
+          ""
+        ],
+        [
+          "ex:sw301",
+          "",
+          "",
+          ""
+        ]
+      ]
+    },
+    "owl": {
+      "vars": [
+        "c1",
+        "topic",
+        "s",
+        "r"
+      ],
+      "rows": [
+        [
+          "",
+          "",
+          "",
+          "ex:elena"
+        ],
+        [
+          "",
+          "",
+          "ex:a_rossi",
+          ""
+        ],
+        [
+          "",
+          "",
+          "ex:alice",
+          ""
+        ],
+        [
+          "",
+          "",
+          "ex:profAlice",
+          ""
+        ],
+        [
+          "",
+          "ex:SemanticWeb",
+          "",
+          ""
+        ],
+        [
+          "ex:kg101",
+          "",
+          "",
+          ""
+        ],
+        [
+          "ex:sw301",
+          "",
+          "",
+          ""
+        ]
+      ]
+    }
+  },
+  "Q7": {
+    "none": {
+      "vars": [
+        "ws",
+        "gt",
+        "st"
+      ],
+      "rows": [
+        [
+          "",
+          "ex:WorkingStudent",
+          ""
+        ],
+        [
+          "ex:giulia",
+          "",
+          ""
+        ]
+      ]
+    },
+    "transitive": {
+      "vars": [
+        "ws",
+        "gt",
+        "st"
+      ],
+      "rows": [
+        [
+          "",
+          "ex:WorkingStudent",
+          ""
+        ],
+        [
+          "ex:giulia",
+          "",
+          ""
+        ]
+      ]
+    },
+    "rdfs": {
+      "vars": [
+        "ws",
+        "gt",
+        "st"
+      ],
+      "rows": [
+        [
+          "",
+          "ex:WorkingStudent",
+          ""
+        ],
+        [
+          "ex:giulia",
+          "",
+          ""
+        ]
+      ]
+    },
+    "owl-micro": {
+      "vars": [
+        "ws",
+        "gt",
+        "st"
+      ],
+      "rows": [
+        [
+          "",
+          "",
+          "ex:alice"
+        ],
+        [
+          "",
+          "",
+          "ex:bruno"
+        ],
+        [
+          "",
+          "",
+          "ex:hugo"
+        ],
+        [
+          "",
+          "_:b",
+          ""
+        ],
+        [
+          "",
+          "ex:Employee",
+          ""
+        ],
+        [
+          "",
+          "ex:Person",
+          ""
+        ],
+        [
+          "",
+          "ex:Student",
+          ""
+        ],
+        [
+          "",
+          "ex:WorkingStudent",
+          ""
+        ],
+        [
+          "",
+          "owl:Thing",
+          ""
+        ],
+        [
+          "",
+          "rdfs:Resource",
+          ""
+        ],
+        [
+          "ex:franco",
+          "",
+          ""
+        ],
+        [
+          "ex:giulia",
+          "",
+          ""
+        ]
+      ]
+    },
+    "owl-mini": {
+      "vars": [
+        "ws",
+        "gt",
+        "st"
+      ],
+      "rows": [
+        [
+          "",
+          "",
+          "ex:a_rossi"
+        ],
+        [
+          "",
+          "",
+          "ex:alice"
+        ],
+        [
+          "",
+          "",
+          "ex:bruno"
+        ],
+        [
+          "",
+          "",
+          "ex:hugo"
+        ],
+        [
+          "",
+          "",
+          "ex:profAlice"
+        ],
+        [
+          "",
+          "_:b",
+          ""
+        ],
+        [
+          "",
+          "ex:Employee",
+          ""
+        ],
+        [
+          "",
+          "ex:Person",
+          ""
+        ],
+        [
+          "",
+          "ex:Student",
+          ""
+        ],
+        [
+          "",
+          "ex:WorkingStudent",
+          ""
+        ],
+        [
+          "",
+          "owl:Thing",
+          ""
+        ],
+        [
+          "",
+          "rdfs:Resource",
+          ""
+        ],
+        [
+          "ex:franco",
+          "",
+          ""
+        ],
+        [
+          "ex:giulia",
+          "",
+          ""
+        ]
+      ]
+    },
+    "owl": {
+      "vars": [
+        "ws",
+        "gt",
+        "st"
+      ],
+      "rows": [
+        [
+          "",
+          "",
+          "ex:a_rossi"
+        ],
+        [
+          "",
+          "",
+          "ex:alice"
+        ],
+        [
+          "",
+          "",
+          "ex:bruno"
+        ],
+        [
+          "",
+          "",
+          "ex:hugo"
+        ],
+        [
+          "",
+          "",
+          "ex:profAlice"
+        ],
+        [
+          "",
+          "_:b",
+          ""
+        ],
+        [
+          "",
+          "ex:Employee",
+          ""
+        ],
+        [
+          "",
+          "ex:Person",
+          ""
+        ],
+        [
+          "",
+          "ex:Student",
+          ""
+        ],
+        [
+          "",
+          "ex:WorkingStudent",
+          ""
+        ],
+        [
+          "",
+          "owl:Thing",
+          ""
+        ],
+        [
+          "",
+          "rdfs:Resource",
+          ""
+        ],
+        [
+          "ex:franco",
+          "",
+          ""
+        ],
+        [
+          "ex:giulia",
+          "",
+          ""
+        ]
+      ]
+    }
+  },
+  "Q8": {
+    "none": {
+      "vars": [
+        "org"
+      ],
+      "rows": [
+        [
+          "ex:kgGroup"
+        ]
+      ]
+    },
+    "transitive": {
+      "vars": [
+        "org"
+      ],
+      "rows": [
+        [
+          "ex:kgGroup"
+        ]
+      ]
+    },
+    "rdfs": {
+      "vars": [
+        "org"
+      ],
+      "rows": [
+        [
+          "ex:kgGroup"
+        ]
+      ]
+    },
+    "owl-micro": {
+      "vars": [
+        "org"
+      ],
+      "rows": [
+        [
+          "ex:kgGroup"
+        ]
+      ]
+    },
+    "owl-mini": {
+      "vars": [
+        "org"
+      ],
+      "rows": [
+        [
+          "ex:kgGroup"
+        ]
+      ]
+    },
+    "owl": {
+      "vars": [
+        "org"
+      ],
+      "rows": [
+        [
+          "ex:kgGroup"
+        ]
+      ]
+    }
+  },
+  "Q9": {
+    "none": {
+      "vars": [
+        "x",
+        "h"
+      ],
+      "rows": []
+    },
+    "transitive": {
+      "vars": [
+        "x",
+        "h"
+      ],
+      "rows": []
+    },
+    "rdfs": {
+      "vars": [
+        "x",
+        "h"
+      ],
+      "rows": []
+    },
+    "owl-micro": {
+      "vars": [
+        "x",
+        "h"
+      ],
+      "rows": []
+    },
+    "owl-mini": {
+      "vars": [
+        "x",
+        "h"
+      ],
+      "rows": [
+        [
+          "ex:dario",
+          ""
+        ]
+      ]
+    },
+    "owl": {
+      "vars": [
+        "x",
+        "h"
+      ],
+      "rows": [
+        [
+          "ex:dario",
+          ""
+        ]
+      ]
+    }
+  }
+}

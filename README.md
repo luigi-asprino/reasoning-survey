@@ -4,7 +4,9 @@ Experiments on what SPARQL endpoints with built-in reasoning actually infer, and
 what that reasoning costs at load time, together with LaTeX notes relating the
 entailment regimes to Description Logic families and OWL 2 profiles.
 
-GraphDB is the only triplestore tested so far. Each test family has one
+Tested so far: GraphDB and Apache Jena Fuseki (reasoning capability); GraphDB
+only (loading time). A cross-triplestore summary of the reasoning-capability
+results is in [`reasoning-capability-test/SUMMARY.md`](reasoning-capability-test/SUMMARY.md). Each test family has one
 subfolder per triplestore, so others can be added side by side.
 
 ## Layout
@@ -27,7 +29,7 @@ reasoning/
 | Folder | Content |
 |---|---|
 | [`notes/`](notes/README.md) | Notes on DL naming, OWL 2 profiles, GraphDB rulesets as Horn fragments, empirical results and available reasoners. |
-| [`reasoning-capability-test/`](reasoning-capability-test/README.md) | Test KG and query suite to compare entailment regimes; consistency checks; analysis of the ECMO + DUL inconsistencies. |
+| [`reasoning-capability-test/`](reasoning-capability-test/README.md) | Test KG and query suite to compare entailment regimes (GraphDB, Fuseki); consistency checks; analysis of the ECMO + DUL inconsistencies. |
 | [`loading-time-test/`](loading-time-test/README.md) | Loading-time and materialisation-size benchmarks, on the test KG and on the ECMO ontology. |
 
 ## Conventions

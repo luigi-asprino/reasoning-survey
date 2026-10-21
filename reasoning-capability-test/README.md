@@ -29,6 +29,10 @@ The inputs are plain RDF and SPARQL, so they can be reused for any triplestore.
 | Folder | Triplestore | Status |
 |---|---|---|
 | [`graphdb/`](graphdb/README.md) | Ontotext GraphDB 10.x | rulesets compared; findings in the README |
+| [`fuseki/`](fuseki/README.md) | Apache Jena Fuseki 5.x | query suite run on the Jena reasoners; findings in the README |
+
+A side-by-side summary of the results across triplestores is in
+[`SUMMARY.md`](SUMMARY.md).
 
 Each triplestore folder contains `code/`, `data/` and `results/`; see the
 [root README](../README.md#conventions) for the conventions.
