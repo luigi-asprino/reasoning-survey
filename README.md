@@ -4,8 +4,8 @@ Experiments on what SPARQL endpoints with built-in reasoning actually infer, and
 what that reasoning costs at load time, together with LaTeX notes relating the
 entailment regimes to Description Logic families and OWL 2 profiles.
 
-Tested so far: GraphDB and Apache Jena Fuseki (reasoning capability); GraphDB
-only (loading time). A cross-triplestore summary of the reasoning-capability
+Tested so far: GraphDB and Apache Jena Fuseki (reasoning capability and
+loading time). A cross-triplestore summary of the reasoning-capability
 results is in [`reasoning-capability-test/SUMMARY.md`](reasoning-capability-test/SUMMARY.md). Each test family has one
 subfolder per triplestore, so others can be added side by side.
 

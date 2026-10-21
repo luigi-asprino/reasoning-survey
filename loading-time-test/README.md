@@ -33,6 +33,7 @@ Workloads:
 | Folder | Triplestore | Status |
 |---|---|---|
 | [`graphdb/`](graphdb/README.md) | Ontotext GraphDB 10.x | benchmark on all built-in rulesets except `rdfsplus*` |
+| [`fuseki/`](fuseki/README.md) | Apache Jena Fuseki 5.x (Jena reasoners) | scripts ready, not yet run; Fuseki computes inferences at first use, so the full closure is timed instead of the load |
 
 Each triplestore folder contains `code/`, `data/` and `results/`; see the
 [root README](../README.md#conventions) for the conventions.
