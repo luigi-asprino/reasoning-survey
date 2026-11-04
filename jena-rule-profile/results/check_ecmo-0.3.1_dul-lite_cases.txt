@@ -1,0 +1,23 @@
+2,643 rules compiled from 41,632 ontology triples (1.4 s)
+explicit 43,082  inferred 73,969  total 117,051  (9 rounds, 38.2 s)
+
+Inferred triples per predicate (top 15):
+     26,103  http://www.w3.org/1999/02/22-rdf-syntax-ns#type
+     16,074  http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#associatedWith
+      7,947  http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#sameSettingAs
+      3,391  http://data.europa.eu/h8v/ecmo/public-health/isSusceptibleHostOf
+      2,713  http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#isClassifiedBy
+      2,713  http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#classifies
+      2,663  http://data.europa.eu/h8v/ecmo/core/hazard/hasHazardCategory
+      1,590  https://w3id.org/framester/schema/subsumedUnder
+      1,433  http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#isDescribedBy
+      1,433  http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#describes
+      1,258  http://data.europa.eu/h8v/ecmo/public-health/isRouteOfTransmissionOf
+        563  http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#precedes
+        563  http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#follows
+        439  http://data.europa.eu/h8v/ecmo/bio/hasOrganismRole
+        287  http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#isMemberOf
+
+Consistency checks fired: 2
+      2  disjoint classes http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#Event http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#Object
+         e.g. EWS_Warning_16Apr, CruiseShipHantavirusEvent

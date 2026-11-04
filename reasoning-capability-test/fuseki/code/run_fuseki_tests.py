@@ -62,12 +62,15 @@ REASONERS = {
     "owl-micro":  (JENA + "OWLMicroFBRuleReasoner", "RDFS + some OWL (inverse, transitive, symmetric, equivalence, intersection, hasValue)"),
     "owl-mini":   (JENA + "OWLMiniFBRuleReasoner", "OWL rules without bNode-creating rules (minCardinality, someValuesFrom)"),
     "owl":        (JENA + "OWLFBRuleReasoner", "full Jena OWL rule set (OWL Lite + part of OWL DL)"),
+    "compiled":   (JENA + "GenericRuleReasoner", "rule profile compiled from the ontology "
+                                                 "(jena-rule-profile/code/compile_rules.py)"),
 }
+COMPILER = HERE.parents[2] / "jena-rule-profile" / "code" / "compile_rules.py"
 SPARQL_JSON = "application/sparql-results+json"
 
 
 # ------------------------------------------------------------------ config file
-def config_ttl(reasoners, data_files):
+def config_ttl(reasoners, data_files, rules=None):
     content = " ,\n            ".join(
         f"[ ja:externalContent <{Path(f).resolve().as_uri()}> ]" for f in data_files)
     out = [
@@ -103,7 +106,8 @@ def config_ttl(reasoners, data_files):
                 f"    ja:defaultGraph :inf_{sid} .",
                 f":inf_{sid} a ja:InfModel ;",
                 "    ja:baseModel :base ;",
-                f"    ja:reasoner [ ja:reasonerURL <{url}> ] .",
+                f"    ja:reasoner [ ja:reasonerURL <{url}> ] ." if name != "compiled" else
+                f"    ja:reasoner [ ja:reasonerURL <{url}> ; ja:rulesFrom <{Path(rules).resolve().as_uri()}> ] .",
             ]
     return "\n".join(out) + "\n"
 
@@ -153,6 +157,8 @@ def main():
                                      "if omitted, Fuseki must already be running with the generated config")
     ap.add_argument("--port", type=int, default=3030)
     ap.add_argument("--reasoners", nargs="*", default=list(REASONERS), choices=list(REASONERS))
+    ap.add_argument("--rules", help="rule profile for the 'compiled' dataset (default: compiled from --data "
+                                    "with compile_rules.py --sameas into ../results/compiled.rules)")
     ap.add_argument("--data", nargs="*", default=[str(DATA_DIR / "university.ttl")])
     ap.add_argument("--queries", default=str(DATA_DIR / "queries.rq"))
     ap.add_argument("--only", nargs="*", help="query ids to run (default: all except Q10)")
@@ -162,7 +168,15 @@ def main():
 
     RESULTS_DIR.mkdir(parents=True, exist_ok=True)
     config = RESULTS_DIR / "fuseki-config.ttl"
-    config.write_text(config_ttl(args.reasoners, args.data), encoding="utf-8")
+    if "compiled" in args.reasoners and not args.rules:
+        # the test KG has schema and data in one file: compile the profile from it,
+        # with the sameAs rules, so that it is comparable with GraphDB owl2-rl
+        args.rules = str(RESULTS_DIR / "compiled.rules")
+        cmd = [sys.executable, str(COMPILER), *args.data, "-o", args.rules, "--sameas"]
+        print("Compiling the rule profile:", " ".join(cmd[2:]))
+        if subprocess.run(cmd).returncode != 0:
+            sys.exit("compile_rules.py failed")
+    config.write_text(config_ttl(args.reasoners, args.data, args.rules), encoding="utf-8")
     print(f"Fuseki config written to {config}")
     if args.config_only:
         return
@@ -178,7 +192,25 @@ def main():
             proc.wait(timeout=30)
 
 
+def check_datasets(base, reasoners, config):
+    """Fail early if the running Fuseki does not serve the generated datasets."""
+    missing = []
+    for r in reasoners:
+        status, body = http_post(f"{base}/{r}/sparql",
+                                 urllib.parse.urlencode({"query": "ASK {}"}).encode(), timeout=600)
+        if status != 200:
+            missing.append(f"{r} (HTTP {status})")
+    if missing:
+        sys.exit(
+            f"The Fuseki at {base} does not serve these datasets: {', '.join(missing)}.\n"
+            "It was probably started without the generated configuration. Either stop it and run\n"
+            "  python code/run_fuseki_tests.py --fuseki <path>/fuseki-server\n"
+            "or restart it with\n"
+            f"  <path>/fuseki-server --config={config}")
+
+
 def run_suite(args, base):
+    check_datasets(base, args.reasoners, RESULTS_DIR / "fuseki-config.ttl")
     queries, prefix_block = parse_queries(args.queries)
     wanted = set(args.only) if args.only else {q for q in queries if q != "Q10"}
     queries = {k: v for k, v in queries.items() if k in wanted}

@@ -52,9 +52,14 @@ python code/run_fuseki_tests.py --config-only
 python code/run_fuseki_tests.py
 ```
 
-Datasets: `none`, `transitive`, `rdfs`, `owl-micro`, `owl-mini`, `owl`, each at
-`http://localhost:3030/<name>/sparql`. Q10 (GraphDB's `onto:implicit`) is
-skipped; see below.
+Datasets: `none`, `transitive`, `rdfs`, `owl-micro`, `owl-mini`, `owl` and
+`compiled`, each at `http://localhost:3030/<name>/sparql`. Q10 (GraphDB's
+`onto:implicit`) is skipped; see below.
+
+`compiled` is a rule profile generated from the test KG by
+[`jena-rule-profile/code/compile_rules.py`](../../jena-rule-profile/README.md)
+(with `--sameas`; needs rdflib), written to `results/compiled.rules`. Pass
+`--rules FILE` to use another profile.
 
 ## Implicit triples and consistency
 
@@ -68,3 +73,37 @@ java -cp $FUSEKI_JAR code/JenaReasoners.java --validate-only ../graphdb/data/inc
 Options: `--reasoners rdfs,owl` (subset), `--top 0` (all predicates). The
 preparation time is the closest analogue of GraphDB's materialisation at load
 time; the same command on ECMO (+ DUL) gives the loading-time comparison.
+
+## Findings so far
+
+Query suite on `university.ttl` (Fuseki 5, in-memory datasets); compare with
+the [GraphDB findings](../graphdb/README.md#findings-so-far).
+
+| Query | none | transitive | rdfs | owl-micro | owl-mini / owl | GraphDB owl2-rl |
+|---|---|---|---|---|---|---|
+| Q1 domain + subClassOf | ✗ | ✗ | ✓ | ✓ | ✓ | ✓ |
+| Q2 subPropertyOf + range | ✗ | ✗ | ✓ | ✓ | ✓ (+ sameAs copies) | ✓ |
+| Q3 inverse / symmetric / transitive | ✗ | ✗ | ✗ | ✓ | ✓ (+ sameAs copies) | ✓ |
+| Q4 equivalentClass / equivalentProperty | ✗ | ✗ | ✗ | ✓ | ✓ | ✓ |
+| Q5 sameAs from IFP / functional | ✗ | ✗ | ✗ | ✗ | ✓ | ✓ |
+| Q6 hasValue, someValuesFrom, allValuesFrom | ✗ | ✗ | ✗ | partial (no allValuesFrom) | ✓ | ✓ |
+| Q7 intersection, union | ✗ | ✗ | ✗ | ✓ | ✓ | ✓ |
+| Q8 property chain | ✗ | ✗ | ✗ | ✗ | ✗ | ✓ |
+| Q9 hasKey | ✗ | ✗ | ✗ | ✗ | ✗ | ✓ |
+
+- `transitive` only closes the class and property hierarchies; it never types
+  instances, so it adds nothing to these queries.
+- `rdfs` applies domain and range correctly (unlike GraphDB's
+  `rdfsplus-optimized`), but has no inverse, symmetric or transitive properties.
+- `owl-micro` sits between GraphDB's rdfsplus and owl-horst: it handles
+  equivalence, inverse/symmetric/transitive properties, hasValue,
+  someValuesFrom, intersection and union, but derives no `owl:sameAs` and does
+  not apply allValuesFrom.
+- `owl-mini` and `owl` give identical answers, the same as GraphDB `owl-max`
+  on Q1–Q7. They differ only on rules that create blank nodes
+  (minCardinality, someValuesFrom as a superclass), which the suite does not test.
+- No Jena reasoner supports OWL 2 property chains or keys (Q8, Q9). On Q9,
+  `owl-mini`/`owl` only return the reflexive `dario owl:sameAs dario`.
+- Jena also returns `rdfs:Resource` among the inferred types.
+- Reasoning happens at the first query: on the test KG this took about 0.35 s
+  for `owl-mini`/`owl` against 0.04 s for `owl-micro`; later queries take a few ms.

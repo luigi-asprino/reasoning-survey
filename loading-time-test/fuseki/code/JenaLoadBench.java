@@ -17,7 +17,9 @@
 //   java -cp fuseki-server.jar JenaLoadBench.java --reasoner owl-mini --runs 3 --warmup 1 \
 //        [--validate] --onto a.ttl b.owl --data c.ttl
 //
-// Reasoners: none, transitive, rdfs, owl-micro, owl-mini, owl.
+// Reasoners: none, transitive, rdfs, owl-micro, owl-mini, owl, and compiled
+// (a rule profile from jena-rule-profile/code/compile_rules.py, given with --rules FILE;
+// its consistency checks are counted from the urn:jena-profile#violates triples).
 
 import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.Triple;
@@ -25,6 +27,8 @@ import org.apache.jena.rdf.model.*;
 import org.apache.jena.reasoner.Reasoner;
 import org.apache.jena.reasoner.ReasonerRegistry;
 import org.apache.jena.reasoner.ValidityReport;
+import org.apache.jena.reasoner.rulesys.GenericRuleReasoner;
+import org.apache.jena.reasoner.rulesys.Rule;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFLanguages;
@@ -35,8 +39,17 @@ import java.util.*;
 
 public class JenaLoadBench {
 
+    static String rulesFile = null;
+
     static Reasoner reasoner(String name) {
         return switch (name) {
+            case "compiled" -> {
+                if (rulesFile == null) throw new IllegalArgumentException("--rules FILE is required for 'compiled'");
+                // forward rules only, run by the RETE engine: inferences are materialised in prepare()
+                GenericRuleReasoner r = new GenericRuleReasoner(Rule.rulesFromURL(rulesFile));
+                r.setMode(GenericRuleReasoner.FORWARD_RETE);
+                yield r;
+            }
             case "none" -> null;
             case "transitive" -> ReasonerRegistry.getTransitiveReasoner();
             case "rdfs" -> ReasonerRegistry.getRDFSReasoner();
@@ -89,6 +102,7 @@ public class JenaLoadBench {
                 case "--runs" -> { runs = Integer.parseInt(args[++i]); cur = null; }
                 case "--warmup" -> { warmup = Integer.parseInt(args[++i]); cur = null; }
                 case "--validate" -> { validate = true; cur = null; }
+                case "--rules" -> { rulesFile = args[++i]; cur = null; }
                 case "--onto" -> cur = onto;
                 case "--data" -> cur = data;
                 default -> {
@@ -140,7 +154,20 @@ public class JenaLoadBench {
                     r.put("inferred", inferred);
                     r.put("total", total);
 
-                    if (validate && !name.equals("transitive")) {
+                    if (validate && name.equals("compiled")) {
+                        t0 = System.nanoTime();
+                        Property violates = inf.createProperty("urn:jena-profile#violates");
+                        List<String> errs = new ArrayList<>();
+                        long n = 0;
+                        for (StmtIterator vi = inf.listStatements(null, violates, (RDFNode) null); vi.hasNext(); ) {
+                            Statement st = vi.next();
+                            n++;
+                            if (errs.size() < 3) errs.add(st.getSubject() + ": " + st.getObject());
+                        }
+                        r.put("validate_s", secs(t0));
+                        r.put("consistent", n == 0);
+                        if (n > 0) r.put("error", n + " violation(s); " + String.join(" | ", errs));
+                    } else if (validate && !name.equals("transitive")) {
                         t0 = System.nanoTime();
                         ValidityReport vr = inf.validate();
                         r.put("validate_s", secs(t0));

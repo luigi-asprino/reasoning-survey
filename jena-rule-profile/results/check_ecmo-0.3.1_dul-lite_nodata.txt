@@ -1,0 +1,21 @@
+2,643 rules compiled from 41,632 ontology triples (1.4 s)
+explicit 41,632  inferred 68,291  total 109,923  (9 rounds, 35.4 s)
+
+Inferred triples per predicate (top 15):
+     24,286  http://www.w3.org/1999/02/22-rdf-syntax-ns#type
+     14,588  http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#associatedWith
+      7,385  http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#sameSettingAs
+      3,391  http://data.europa.eu/h8v/ecmo/public-health/isSusceptibleHostOf
+      2,653  http://data.europa.eu/h8v/ecmo/core/hazard/hasHazardCategory
+      2,533  http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#isClassifiedBy
+      2,533  http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#classifies
+      1,568  https://w3id.org/framester/schema/subsumedUnder
+      1,416  http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#isDescribedBy
+      1,416  http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#describes
+      1,254  http://data.europa.eu/h8v/ecmo/public-health/isRouteOfTransmissionOf
+        551  http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#precedes
+        551  http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#follows
+        432  http://data.europa.eu/h8v/ecmo/bio/hasOrganismRole
+        282  http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#isMemberOf
+
+Consistency checks fired: 0

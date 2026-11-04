@@ -24,6 +24,13 @@ Workloads:
   python benchmark_reasoners.py --jar FUSEKI_JAR --ecmo-workload --no-data --dul-lite      # setting 3
   python benchmark_reasoners.py --jar FUSEKI_JAR --ecmo-workload --no-data --dul-lite --consistency  # setting 4
   python benchmark_reasoners.py --jar FUSEKI_JAR --ecmo-workload --dul --reasoners none rdfs owl-mini
+  python benchmark_reasoners.py --jar FUSEKI_JAR --ecmo-workload --no-data --dul-lite --reasoners rdfs compiled
+  python benchmark_reasoners.py --jar FUSEKI_JAR --ecmo-workload --dul --reasoners compiled \
+         --profile-args="--no-transitive dul:associatedWith --no-symmetric dul:associatedWith"
+
+'compiled' is a rule profile generated from the ontology by
+../../../jena-rule-profile/code/compile_rules.py (needs rdflib): forward rules
+only, run by Jena's RETE engine, so the inferences are materialised in prepare().
 
 Writes ../results/benchmark_reasoners_<timestamp>.csv or
 ../results/ecmo_benchmark_<data|nodata>[_<dul variant>][_consistency]_<timestamp>.csv
@@ -47,7 +54,9 @@ UNIVERSITY = HERE.parents[2] / "reasoning-capability-test" / "graphdb" / "data" 
 DEFAULT_ECMO = HERE.parents[3] / "ecmo" / "0.3.1_audited"        # JRC/ecmo, next to the reasoning repo
 JAVA_SRC = HERE / "JenaLoadBench.java"
 
-REASONERS = ["none", "transitive", "rdfs", "owl-micro", "owl-mini", "owl"]
+REASONERS = ["none", "transitive", "rdfs", "owl-micro", "owl-mini", "owl", "compiled"]
+DEFAULT_REASONERS = REASONERS[:-1]
+COMPILER = HERE.parents[2] / "jena-rule-profile" / "code" / "compile_rules.py"
 CASE_FIXTURES = ["ecmo-ebola-case.ttl", "ecmo-hantavirus-case.ttl",
                  "ecmo-coreference-pattern-fixture.ttl", "ecmo-phsm-fixtures.ttl"]
 DEPS = {"DUL.owl": "http://www.ontologydesignpatterns.org/ont/dul/DUL.owl",
@@ -99,6 +108,8 @@ def run_reasoner(args, name, onto, data):
            "--reasoner", name, "--runs", str(args.repetitions), "--warmup", str(args.warmup)]
     if args.consistency:
         cmd.append("--validate")
+    if name == "compiled":
+        cmd += ["--rules", str(args.rules)]
     cmd += ["--onto", *map(str, onto), "--data", *map(str, data)]
     print(f"{name:<12} {datetime.now():%H:%M:%S} started", flush=True)
     rows, err = [], None
@@ -167,7 +178,12 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--jar", default=os.environ.get("FUSEKI_JAR"),
                     help="fuseki-server.jar (bundles Jena); default: $FUSEKI_JAR")
-    ap.add_argument("--reasoners", nargs="+", default=REASONERS, choices=REASONERS)
+    ap.add_argument("--reasoners", nargs="+", default=DEFAULT_REASONERS, choices=REASONERS,
+                    help="default: all but 'compiled'")
+    ap.add_argument("--rules", help="rule profile for 'compiled' (default: compiled from the ontology "
+                                    "files with ../../../jena-rule-profile/code/compile_rules.py)")
+    ap.add_argument("--profile-args", default="",
+                    help="extra compile_rules.py options, written with '=', e.g. --profile-args=\"--sameas\"")
     ap.add_argument("--ontology", nargs="*", default=[], help="TBox files (ignored with --ecmo-workload)")
     ap.add_argument("--data", nargs="*", default=None, help="data files (default: university.ttl)")
     ap.add_argument("--ecmo-workload", action="store_true", help="ECMO modules + alignments as ontology, case fixtures as data")
@@ -202,6 +218,16 @@ def main():
           f"{args.warmup} warm-up + {args.repetitions} runs, consistency={args.consistency})")
     print_files("Ontology", onto)
     print_files("Data", data)
+
+    if "compiled" in args.reasoners and not args.rules:
+        args.rules = str(out.with_suffix(".rules"))
+        cmd = [sys.executable, str(COMPILER), *map(str, onto or data), "-o", args.rules,
+               *args.profile_args.split()]
+        t0 = datetime.now()
+        print("Compiling the rule profile:", " ".join(cmd[2:]))
+        if subprocess.run(cmd).returncode != 0:
+            sys.exit("compile_rules.py failed")
+        print(f"  compiled in {(datetime.now() - t0).total_seconds():.1f} s (one-off, not included in the timings)")
 
     rows = []
     with out.open("w", newline="") as fh:

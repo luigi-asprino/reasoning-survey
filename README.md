@@ -15,15 +15,18 @@ subfolder per triplestore, so others can be added side by side.
 reasoning/
 ├── notes/                         LaTeX notes and slides on DL/OWL expressivity
 ├── reasoning-capability-test/     what each entailment regime infers
-│   └── graphdb/
-│       ├── code/
-│       ├── data/
-│       └── results/
-└── loading-time-test/             how much each entailment regime costs at load time
-    └── graphdb/
-        ├── code/
-        ├── data/
-        └── results/
+│   ├── graphdb/
+│   │   ├── code/
+│   │   ├── data/
+│   │   └── results/
+│   └── fuseki/
+├── loading-time-test/             how much each entailment regime costs at load time
+│   ├── graphdb/
+│   │   ├── code/
+│   │   ├── data/
+│   │   └── results/
+│   └── fuseki/
+└── jena-rule-profile/             an ontology-specific Jena rule profile (ECMO)
 ```
 
 | Folder | Content |
@@ -31,6 +34,7 @@ reasoning/
 | [`notes/`](notes/README.md) | Notes on DL naming, OWL 2 profiles, GraphDB rulesets as Horn fragments, empirical results and available reasoners. |
 | [`reasoning-capability-test/`](reasoning-capability-test/README.md) | Test KG and query suite to compare entailment regimes (GraphDB, Fuseki); consistency checks; analysis of the ECMO + DUL inconsistencies. |
 | [`loading-time-test/`](loading-time-test/README.md) | Loading-time and materialisation-size benchmarks, on the test KG and on the ECMO ontology. |
+| [`jena-rule-profile/`](jena-rule-profile/README.md) | Compiles an ontology into forward Jena rules specialised to its axioms (OWL 2 RL subset), so Fuseki can reason on ECMO + DUL; includes the ECMO 0.3.1 profile. |
 
 ## Conventions
 
