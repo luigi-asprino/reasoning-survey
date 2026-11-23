@@ -41,7 +41,7 @@ Notes:
 | `results/` | One CSV per benchmark run. |
 
 Inputs are shared with the GraphDB benchmark, not copied: DUL variants and the
-downloaded DUL/d0 are read from `../graphdb/data/`, ECMO from
+downloaded DUL/d0 are read from the shared [`reasoning/data/`](../../data/README.md), ECMO from
 `JRC/ecmo/0.3.1_audited`.
 
 ## Usage

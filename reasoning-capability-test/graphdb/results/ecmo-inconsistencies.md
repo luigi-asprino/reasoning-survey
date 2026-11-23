@@ -297,7 +297,7 @@ Paths below are relative to the repository root.
 # all violations with derivations (needs rdflib)
 CD=reasoning-capability-test/graphdb/code
 python3 $CD/check_disjointness.py                   # ECMO + DUL-lite + case fixtures
-python3 $CD/check_disjointness.py --dul loading-time-test/graphdb/data/ecmo-deps/DUL.owl
+python3 $CD/check_disjointness.py --dul data/ecmo-deps/DUL.owl
 python3 $CD/check_disjointness.py --no-data         # ontology only: 0 violations
 python3 $CD/check_disjointness.py --examples 3      # more derivations per group
 

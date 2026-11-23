@@ -49,7 +49,7 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 RESULTS_DIR = HERE.parent / "results"
-GRAPHDB_DATA = HERE.parents[1] / "graphdb" / "data"           # dul-variants/, ecmo-deps/ (shared)
+GRAPHDB_DATA = HERE.parents[2] / "data"                       # reasoning/data: dul-variants/, ecmo-deps/ (shared)
 UNIVERSITY = HERE.parents[2] / "reasoning-capability-test" / "graphdb" / "data" / "university.ttl"
 DEFAULT_ECMO = HERE.parents[3] / "ecmo" / "0.3.1_audited"        # JRC/ecmo, next to the reasoning repo
 JAVA_SRC = HERE / "JenaLoadBench.java"
@@ -80,7 +80,7 @@ def ecmo_files(args):
     if not ecmo.is_dir():
         sys.exit(f"ECMO folder not found: {ecmo}")
     onto, tag = [], []
-    if args.dul_variant:
+    if args.dul_variant or args.dul_file:
         dul = {"dul": None, "dul-lite": GRAPHDB_DATA / "dul-variants" / "DUL-lite.ttl",
                "dul-flat": GRAPHDB_DATA / "dul-variants" / "DUL-flat.ttl"}.get(args.dul_variant)
         dul = Path(args.dul_file) if args.dul_file else (dul or fetch_dep("DUL.owl"))
@@ -89,7 +89,7 @@ def ecmo_files(args):
     data = [] if args.no_data else [ecmo / "0.3.1-unittests" / f for f in CASE_FIXTURES
                                      if (ecmo / "0.3.1-unittests" / f).exists()]
     tag.append("nodata" if args.no_data else "data")
-    if args.dul_variant:
+    if args.dul_variant or args.dul_file:
         tag.append(f"dul-{Path(args.dul_file).stem}" if args.dul_file else args.dul_variant)
     if args.consistency:
         tag.append("consistency")
@@ -193,7 +193,7 @@ def main():
     g.add_argument("--dul", dest="dul_variant", action="store_const", const="dul", help="also load DUL + d0")
     g.add_argument("--dul-lite", dest="dul_variant", action="store_const", const="dul-lite")
     g.add_argument("--dul-flat", dest="dul_variant", action="store_const", const="dul-flat")
-    ap.add_argument("--dul-file", help="with --dul: load this file instead of DUL")
+    ap.add_argument("--dul-file", help="load this DUL version (+ d0) instead of the original DUL")
     ap.add_argument("--consistency", action="store_true", help="also run validate() and record consistency")
     ap.add_argument("-n", "--repetitions", type=int, default=3)
     ap.add_argument("--warmup", type=int, default=1, help="warm-up runs per reasoner, excluded from the summary")

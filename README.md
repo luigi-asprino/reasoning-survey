@@ -13,6 +13,7 @@ subfolder per triplestore, so others can be added side by side.
 
 ```
 reasoning/
+├── data/                          shared inputs: DUL versions, d0
 ├── notes/                         LaTeX notes and slides on DL/OWL expressivity
 ├── reasoning-capability-test/     what each entailment regime infers
 │   ├── graphdb/
@@ -23,7 +24,6 @@ reasoning/
 ├── loading-time-test/             how much each entailment regime costs at load time
 │   ├── graphdb/
 │   │   ├── code/
-│   │   ├── data/
 │   │   └── results/
 │   └── fuseki/
 └── jena-rule-profile/             an ontology-specific Jena rule profile (ECMO)
@@ -31,6 +31,7 @@ reasoning/
 
 | Folder | Content |
 |---|---|
+| [`data/`](data/README.md) | DUL, its lighter variants, DUL 4.3 and d0, shared by all tests. |
 | [`notes/`](notes/README.md) | Notes on DL naming, OWL 2 profiles, GraphDB rulesets as Horn fragments, empirical results and available reasoners. |
 | [`reasoning-capability-test/`](reasoning-capability-test/README.md) | Test KG and query suite to compare entailment regimes (GraphDB, Fuseki); consistency checks; analysis of the ECMO + DUL inconsistencies. |
 | [`loading-time-test/`](loading-time-test/README.md) | Loading-time and materialisation-size benchmarks, on the test KG and on the ECMO ontology. |
@@ -38,9 +39,9 @@ reasoning/
 
 ## Conventions
 
-- Every `<test>/<triplestore>/` folder has the same three subfolders:
-  `code/` (scripts), `data/` (inputs) and `results/` (outputs, reports and
-  analyses).
+- Every `<test>/<triplestore>/` folder has `code/` (scripts) and `results/`
+  (outputs, reports and analyses), plus `data/` when it has inputs of its own.
+  Inputs shared across tests (DUL versions, d0) are in the top-level `data/`.
 - Default paths in the scripts are resolved relative to the script itself, so
   every command works from any directory. By default, inputs are read from
   `../data` and outputs are written to `../results`.
@@ -57,8 +58,9 @@ These are kept explicit instead of duplicating code or data:
 - `loading-time-test/graphdb/code/benchmark_rulesets.py` uses
   `reasoning-capability-test/graphdb/data/university.ttl` as its default
   (smoke-test) data.
-- `reasoning-capability-test/graphdb/code/check_disjointness.py` reads the DUL
-  variants and the downloaded DUL/d0 from `loading-time-test/graphdb/data/`.
+- DUL, its variants and d0 live in the shared [`data/`](data/README.md) folder, used
+  by both benchmarks (GraphDB and Fuseki), `check_disjointness.py` and the Jena
+  rule profile.
 
 ### External data
 

@@ -35,5 +35,6 @@ Workloads:
 | [`graphdb/`](graphdb/README.md) | Ontotext GraphDB 10.x | benchmark on all built-in rulesets except `rdfsplus*` |
 | [`fuseki/`](fuseki/README.md) | Apache Jena Fuseki 5.x (Jena reasoners) | settings 1 and 3 run; OWL reasoners fail on ECMO + DUL-lite; findings in the README |
 
-Each triplestore folder contains `code/`, `data/` and `results/`; see the
+Each triplestore folder contains `code/` and `results/`; the shared inputs
+(DUL versions, d0) are in [`../data/`](../data/README.md). See the
 [root README](../README.md#conventions) for the conventions.

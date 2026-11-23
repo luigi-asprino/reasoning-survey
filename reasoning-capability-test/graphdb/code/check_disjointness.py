@@ -15,13 +15,13 @@ Not applied: owl:sameAs, property chains, cardinalities, datatypes.
 
 Usage:
   python check_disjointness.py                                   # defaults below
-  python check_disjointness.py --dul ../../../loading-time-test/graphdb/data/ecmo-deps/DUL.owl --data my-case.ttl
+  python check_disjointness.py --dul ../../../data/ecmo-deps/DUL.owl --data my-case.ttl
   python check_disjointness.py --no-data                         # ontology only
 
 Defaults (relative to this script, so it can be run from any directory):
   ECMO   ../../../../ecmo/0.3.1_audited
-  DUL    loading-time-test/graphdb/data/dul-variants/DUL-lite.ttl
-  d0     loading-time-test/graphdb/data/ecmo-deps/d0.owl
+  DUL    data/dul-variants/DUL-lite.ttl
+  d0     data/ecmo-deps/d0.owl
 
 Requires rdflib (pip install rdflib).
 """
@@ -39,7 +39,7 @@ HERE = Path(__file__).resolve().parent
 REPO_ROOT = HERE.parents[2]                     # .../reasoning
 ECMO_DIR = REPO_ROOT.parent / "ecmo" / "0.3.1_audited"
 # DUL variants and downloaded imports are shared with the loading-time benchmark
-SHARED_DATA = REPO_ROOT / "loading-time-test" / "graphdb" / "data"
+SHARED_DATA = REPO_ROOT / "data"
 DUL_NS = "http://www.ontologydesignpatterns.org/ont/"
 CASES = ["ecmo-ebola-case.ttl", "ecmo-hantavirus-case.ttl",
          "ecmo-coreference-pattern-fixture.ttl", "ecmo-phsm-fixtures.ttl"]

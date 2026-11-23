@@ -335,6 +335,6 @@ TSWLatexianTemp*
 benchmark_rulesets_*.csv
 ecmo_benchmark_*.csv
 
-# loading-time-test/graphdb/data: downloaded DUL / d0
+# data/ecmo-deps: downloaded DUL / d0
 ecmo-deps/
 __pycache__/

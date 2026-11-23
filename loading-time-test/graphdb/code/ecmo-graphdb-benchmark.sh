@@ -11,9 +11,9 @@
 #   --data | --no-data     also load the case fixtures as data (default: --data)
 #   --dul | --no-dul       also load DUL and d0 as ontology (default: --no-dul)
 #   --dul-lite             like --dul, but dul:associatedWith is neither transitive
-#                          nor symmetric (../data/dul-variants/DUL-lite.ttl)
+#                          nor symmetric (reasoning/data/dul-variants/DUL-lite.ttl)
 #   --dul-flat             like --dul, but no DUL property is transitive or
-#                          symmetric (../data/dul-variants/DUL-flat.ttl)
+#                          symmetric (reasoning/data/dul-variants/DUL-flat.ttl)
 #   --dul-file FILE        like --dul, but load FILE instead of DUL
 #   --consistency          enable GraphDB consistency checks; an inconsistent load
 #                          is reported as INCONSISTENT with the violated rule
@@ -33,7 +33,7 @@
 set -euo pipefail
 
 HERE="$(cd "$(dirname "$0")" && pwd)"          # .../loading-time-test/graphdb/code
-DATA_DIR="$(cd "$HERE/../data" && pwd)"
+DATA_DIR="$(cd "$HERE/../../../data" && pwd)"   # reasoning/data (shared)
 RESULTS_DIR="$(cd "$HERE/../results" && pwd)"
 ECMO="$HERE/../../../../ecmo/0.3.1_audited"     # JRC/ecmo, next to the reasoning repo
 SAMEAS="both"

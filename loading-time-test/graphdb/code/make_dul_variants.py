@@ -16,10 +16,10 @@ ontology header listing what was removed.
 Usage:
   python make_dul_variants.py [DUL.owl] [-o OUTDIR]     # writes DUL-lite.ttl, DUL-flat.ttl
 
-Default OUTDIR: ../data/dul-variants (relative to this script).
+Default OUTDIR: reasoning/data/dul-variants (relative to this script: ../../../data/dul-variants).
 
 Requires rdflib (pip install rdflib). The generated files are committed in
-../data/dul-variants/, so the benchmark itself does not need rdflib.
+reasoning/data/dul-variants/, so the benchmark itself does not need rdflib.
 """
 import argparse
 from pathlib import Path
@@ -62,7 +62,7 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("dul", nargs="?", help=f"DUL file (default: download {DUL_URL})")
     ap.add_argument("-o", "--outdir",
-                    default=str(Path(__file__).resolve().parent.parent / "data" / "dul-variants"))
+                    default=str(Path(__file__).resolve().parents[3] / "data" / "dul-variants"))
     args = ap.parse_args()
     src = args.dul or DUL_URL
     out = Path(args.outdir)

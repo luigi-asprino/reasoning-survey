@@ -91,7 +91,7 @@ Since GraphDB stops at the first violation, `check_disjointness.py` computes
 the OWL 2 RL type inferences that matter for disjointness and lists all
 violations, grouped by the ECMO → DUL alignments involved. Defaults: ECMO from
 `JRC/ecmo/0.3.1_audited`, `DUL-lite.ttl` and `d0.owl` from
-`loading-time-test/graphdb/data/`.
+`data/` at the root of the repository.
 
 ```bash
 python code/check_disjointness.py                   # ECMO + DUL-lite + case fixtures
